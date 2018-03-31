@@ -2,4 +2,4 @@
 
 www.codewars.com
 
-Code Warriors Kata's
+Code Warrior Kata's
