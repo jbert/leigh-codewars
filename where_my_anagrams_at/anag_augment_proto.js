@@ -9,7 +9,7 @@ function anagrams(word, words) {
   return words.filter(x => x.sort() === word.sort());
 }
 
-anagrams('abcdedbaf', ['aabb', 'abcd', 'bbaa', 'dada']);
+anagrams('abcd', ['aabb', 'abcd', 'bbaa', 'dada']);
 console.timeEnd('queryTime');
 
 // running at 0.85ms

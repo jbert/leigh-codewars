@@ -1,11 +1,13 @@
 // There are solutions to this that you can write on 3-4 lines using array.filter and .sort
 // eslint advises to stick to simple for to loop through arrays and from timing solutions it does
-// run in less than 1/3 the time to run some more complex filter / sort operations and is more
-// readable. This solution simply uses for loop to cycle through each word in Arr, then for each
-// word calls wrdCheck which splits into letters and checks each against the anagram, removing from
-// anagram once found a match. If reaches last letter in word pushes to wordArr
+// run in less than 1/3 the time than the more complex filter / sort operations and is more
+// readable. Assuming it calls similar a function under the hood to perform the operation, this is
+// a manual solution. This solution simply uses for loop to cycle through each word in Arr, then
+// for each word calls wrdCheck which splits into letters and checks each against the anagram,
+// removing from anagram once found a match. If reaches last letter in word pushes to wordArr
 
 function anagrams(anagrm, Arr) {
+  console.time('timer1');
   let tempArr = [];
   const wordArr = [];
 
@@ -38,8 +40,7 @@ function anagrams(anagrm, Arr) {
   return wordArr;
 }
 
-console.time('timer1');
-anagrams('abcdedbaf', ['aabb', 'abcd', 'bbaa', 'dada']);
+anagrams('abcd', ['aabb', 'abcd', 'bbaa', 'dada']);
 console.timeEnd('timer1');
 
-// running at 0.3ms
+// running at 0.25ms
