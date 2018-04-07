@@ -15,7 +15,6 @@ function sortArray(array) {
   const tempArr = [];
   arr.forEach((element, index) => {
     const elem = element;
-    // find every odd number, push to tempArr and set orig value to null
     if (elem % 2 === 1) {
       tempArr.push(elem);
       arr[index] = null;
@@ -26,8 +25,8 @@ function sortArray(array) {
   arr.forEach((element, index) => {
     const el = element;
     if (el === null) {
-      // fill the null array values with those sorted in tempArr, shift them from tempArr
       arr[index] = tempArr[0];
+      
       tempArr.shift();
     }
   });
