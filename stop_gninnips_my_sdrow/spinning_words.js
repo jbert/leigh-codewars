@@ -2,18 +2,21 @@
 // splits to array, reverses, joins and returns the whole array joined as a string
 
 function spinWords(str) {
-  let arr;
-  arr = (str.match(/[a-zA-Z]+/gi));
+  const Str = str;
+  let arr = [];
+  arr = (Str.match(/[a-zA-Z]+/gi));
   arr.forEach((val, index, array) => {
+    const Arr = array;
     if (val.length > 4) {
-      array[index] = (val.split('').reverse().join(''));
+      Arr[index] = (val.split('').reverse().join(''));
     }
     return arr;
   });
   return arr.join(' ');
 }
 
-spinWords('Hello this is a test sentence');
+console.log(spinWords('Hello this is a test sentence'));
+// logs: olleH this is a test ecnetnes
 
 
 /*
