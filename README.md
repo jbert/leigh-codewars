@@ -1,3 +1,3 @@
 # codewars
-Code Warriors solutions katas
+Code Warriors kata solutions
 www.codewars.com

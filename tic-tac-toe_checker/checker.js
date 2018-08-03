@@ -16,11 +16,6 @@ Assume that the board comes in the form of a 3x3 array, where the value is 0 if 
 2 if "O" won,
 0 if it's a cat's game (i.e. a draw).
 You may assume that the board passed in is valid in the context of a game of Tic-Tac-Toe.
-
-You can use Test.expect(boolean, [optional] string) to test your code
-Test.expect(isSolved([[0,0,1],
-                      [0,1,2],
-                      [2,1,0]]) === -1);
 */
 
 function isSolved(board) {
@@ -98,18 +93,7 @@ function isSolved(board) {
   return 0;
 }
 
-console.log(isSolved([[2, 1, 1], [0, 1, 1], [2, 2, 2]]));
+// for testing
+module.exports = isSolved;
 
-
-/*
-For the following board: [[2,1,2],[2,1,1],[1,2,1]] - Expected: 0, instead got: undefined
-For the following board: [[1,2,1],[1,1,2],[2,1,2]] - Expected: 0, instead got: undefined
-Test Passed: Value == -1
-For the following board: [[2,2,2],[0,1,1],[1,0,0]] - Expected: 2, instead got: -1
-Test Passed: Value == -1
-For the following board: [[2,1,1],[0,1,1],[2,2,2]] - Expected: 2, instead got: -1
-Test Passed: Value == -1
-For the following board: [[1,2,0],[0,1,2],[0,0,1]] - Expected: 1, instead got: -1
-For the following board: [[1,1,1],[0,2,2],[0,0,0]] - Expected: 1, instead got: -1
-Test Passed: Value == -1
-*/
+// console.log(isSolved([[2, 1, 1], [0, 1, 1], [2, 2, 2]]));
