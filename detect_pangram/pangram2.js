@@ -5,3 +5,6 @@ function isPangram(string) {
 }
 
 // console.assert(isPangram('The quick brown fox jumps over the lazy dog') === true);
+// for test
+
+module.exports = isPangram;

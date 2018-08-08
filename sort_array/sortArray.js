@@ -34,5 +34,8 @@ function sortArray(array) {
   return arr;
 }
 
-console.assert((sortArray([5, 3, 2, 8, 1, 4])).toString()
-  === ([1, 3, 2, 8, 5, 4]).toString(), "Doesn't match");
+module.exports = sortArray;
+
+/* console.assert((sortArray([5, 3, 2, 8, 1, 4])).toString() === 
+([1, 3, 2, 8, 5, 4]).toString(), "Doesn't match");
+*/

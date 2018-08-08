@@ -1,4 +1,13 @@
-// Finds the longest concat string from input array containing k entries
+/* You are given an array strarr of strings and an integer k. Your task is to return the first
+longest string consisting of k consecutive strings taken in the array
+
+eg: longest_consec(["zone", "abigail", "theta", "form", "libe", "zas", "theta", "abigail"], 2)
+--> "abigailtheta"
+
+n being the length of the string array, if n = 0 or k > n or k <= 0 return ""
+*/
+
+// Finds the longest k consecutive string concatenated, from input array containing n entries
 
 function longestConsec(strarr, k) {
   const n = strarr.length;
@@ -6,7 +15,7 @@ function longestConsec(strarr, k) {
     return '';
   }
 
-  // Pseudo: countPointer [`longest concat character count`, `starting index in strarr`]
+  // Pseudo: countPointer is [`longest concat character count`, `starting index in strarr`]
   const countPointer = [0, 0];
   let tempCount = 0;
 
@@ -30,6 +39,10 @@ function longestConsec(strarr, k) {
       return str;
     }
   }
+  return '';
 }
 
-// longestConsec(["zone", "abig", "theta", "form", "libe", "zas", "theta", "abigail"], 2)
+// console.log(longestConsec(['zone', 'abignale', 'theta', 'libeboo', 'thetrtya', 'abigailg'], 4));
+
+// for test
+module.exports = longestConsec;

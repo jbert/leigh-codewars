@@ -4,9 +4,6 @@ function anagrams(wrd, words) {
   return words.filter(a =>
     word === a.split('').sort().join(''));
 }
+// anagrams('abcd', ['aabb', 'abcd', 'bbaa', 'dada']);
 
-console.time('timer1');
-anagrams('abcd', ['aabb', 'abcd', 'bbaa', 'dada']);
-console.timeEnd('timer1');
-
-// running at 0.9ms
+module.exports = anagrams;

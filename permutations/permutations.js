@@ -1,7 +1,10 @@
-/* uses recursion. Taking first 2 digits, reverses, store both in array, then
-take another digit, and place in every possible position in each array, stores them,
-recurses until all digits added in all positions
+/* In this kata you have to create all permutations of an input string and remove duplicates, if
+present. This means, you have to shuffle all letters from the input in all possible orders
 */
+
+// Solution uses recursion. Taking first 2 digits, reverses, store both in array, then
+// take another digit, and place in every possible position in each array, stores them,
+// recurses until all digits added in all positions
 
 function permutations(string) {
   const ltrBank = string.split('');
@@ -71,48 +74,10 @@ function permutations(string) {
     const Tot = [].concat(...tempTotal);
     Tot.sort();
     const uniqArray = uniqArry(Tot);
-    console.log(uniqArray);
     return uniqArray;
   }
+  return uniqArry;
 }
 
-permutations('abc');
-
-/*
-In this kata you have to create all permutations of an input string and remove duplicates, if
-present. This means, you have to shuffle all letters from the input in all possible orders.
-
-Examples:
-
-permutations('a'); // ['a']
-permutations('ab'); // ['ab', 'ba']
-permutations('aabb'); // ['aabb', 'abab', 'abba', 'baab', 'baba', 'bbaa']
-
-describe('permutations', function() {
-  it('examples from description', function() {
-    Test.assertSimilar(permutations('a'), ['a']);
-    Test.assertSimilar(permutations('ab').sort(), ['ab', 'ba'].sort());
-    Test.assertSimilar(permutations('aabb').sort(), ['aabb', 'abab', 'abba', 'baab', 'baba', 'bbaa'
-    ].sort());
-  });
-});
--------
-ab c
-a + bc
-a + cb
-
-abc
-bac
-bca
-
-acb
-cab
-cba
--------
-abcd iterations:
-abc + d
-ab + cd, dc
-a + bcd, cbd, cdb, bdc, dbc, dcb
-abcd, bacd, bcad, bcda, acbd, cabd, cbad, cbda, acdb, cabd, cdab, cdba,
-abdc, badc, bdac, bdca, adbc, dabc, dbac, dbca, adcb, dacb, dcab, dcba
-*/
+// console.log(permutations('ab'));
+module.exports = permutations;
