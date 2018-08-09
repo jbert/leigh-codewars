@@ -23,19 +23,13 @@ function sortArray(array) {
   });
   tempArr.sort((a, b) => a - b);
 
+  // fill the null array values with those sorted in tempArr
   arr.forEach((element, index) => {
-    const el = element;
-    if (el === null) {
-      // fill the null array values with those sorted in tempArr, shift them from tempArr
-      arr[index] = tempArr[0];
-      tempArr.shift();
+    if (element === null) {
+      arr[index] = tempArr.shift();
     }
   });
   return arr;
 }
 
 module.exports = sortArray;
-
-/* console.assert((sortArray([5, 3, 2, 8, 1, 4])).toString() === 
-([1, 3, 2, 8, 5, 4]).toString(), "Doesn't match");
-*/

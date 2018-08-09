@@ -1,6 +1,5 @@
-/* In this kata you have to create all permutations of an input string and remove duplicates, if
-present. This means, you have to shuffle all letters from the input in all possible orders
-*/
+// In this kata you have to create all permutations of an input string and remove duplicates, if
+// present. This means, you have to shuffle all letters from the input in all possible orders
 
 // Solution uses recursion. Taking first 2 digits, reverses, store both in array, then
 // take another digit, and place in every possible position in each array, stores them,
@@ -44,7 +43,7 @@ function permutations(string) {
     tempTotal = Total.slice();
     Total = [];
 
-    // add a new digit to each element in array, then recursion by calling multArrys
+    // add a new digit to each element in array, then recurse by calling multArrys
     while (ltrBank.length > 0) {
       const nxtLtr = ltrBank.pop();
       const len = tempTotal[0].length;
@@ -60,13 +59,13 @@ function permutations(string) {
 
   multArrys(Arr1);
 
-  // to enforce unique array of arrays. :: used as bind, join to join arrays
+  // enforce unique keys in array
   function uniqArry(ar) {
-    const uniqObjKey = {};
+    const uniqKey = {};
     ar.forEach((v) => {
-      uniqObjKey[`${v}::${typeof v}`] = v;
+      uniqKey[v] = v;
     });
-    return Object.keys(uniqObjKey).map(v => uniqObjKey[v].join(''));
+    return Object.keys(uniqKey).map(v => uniqKey[v].join(''));
   }
 
   // if all letters in ltrBank utilized, sort, ensure unique and return
@@ -79,5 +78,5 @@ function permutations(string) {
   return uniqArry;
 }
 
-// console.log(permutations('ab'));
+// console.log(permutations('abcd'));
 module.exports = permutations;
