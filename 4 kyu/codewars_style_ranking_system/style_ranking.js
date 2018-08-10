@@ -1,9 +1,7 @@
-// yet to write!
-
+// yet to solve!
 
 // TODO: create the User class/object
 // it must support rank, progress and the incProgress(rank) method
-
 
 // TODO: Replace examples and use TDD development by writing your own tests
 
@@ -29,7 +27,7 @@ describe("Solution", function(){
   });
 });
 
-
+/*
 Write a class called User that is used to calculate the amount that a user will progress through a ranking system similar to the one Codewars uses.
 
 Business Rules:
@@ -63,4 +61,5 @@ user.progress // => 10
 user.incProgress(-5) // will add 90 progress
 user.progress # => 0 // progress is now zero
 user.rank # => -7 // rank was upgraded to -7
-Note: Codewars no longer uses this algorithm for its own ranking system. It uses a pure Math based solution that gives consistent results no matter what order a set of ranked activities are completed at.
+Note: Codewars no longer uses this algorithm for its own ranking system. It uses a pure Math based solution that gives consistent results no matter what order a set of ranked activities are completed at
+*/
