@@ -12,95 +12,54 @@
 
 class User {
   constructor(Rank) {
-    if (!this.rank) {
-      this.rank = -8;
-    }
-    if (!this.progress) {
-      this.progress = 0;
-    }
+    this.rank = -8;
+    this.progress = 0;
     this.Rank = Rank;
     this.progUp = 0;
   }
 
-  progressCalc() {
+  progrsCheck() {
     const upLevel = Math.floor(this.progUp / 100);
-    this.progress = this.progress + (this.progUp % 100);
+    this.progress = this.progUp % 100;
 
     this.rank += upLevel;
+    if (this.rank === 0) {
+      this.rank += 1;
+    }
     // console.log('From line 29, uplevel ' + upLevel);
-    // console.log('From line 30, rank is now ' + this.rank);
     // console.log('From line 30, this.progress ' + this.progress);
-    return [this.rank, this.progress];
+    return [this.progUp, this.rank, this.progress];
   }
 
-
   incProgress(Rank) {
-    if (!((Rank >= -8) && (Rank <= 8))) {
-      return Error();
-    }
     if (Rank <= this.rank) {
-      return [this.rank, this.progress];
+      return 0;
     }
-
-    this.progUp = (10 * ((this.rank - Rank) ** 2));
-
-    if (this.progUp < 100) {
-      this.progress += this.progUp;
-      return [this.rank, this.progress];
-    }
-
-    if (this.progUp > 100) {
-      if (this.rank < 0) {
-        if ((this.rank * 100 + this.progUp) < 0) {
-          this.progressCalc();
-          return [this.rank, this.progress];
-        }
-        if ((this.rank * 100 + this.progUp) >= 0) {
-          this.progUp = (this.progress) + (10 * ((Rank - this.rank - 1) ** 2));
-          if ((this.rank * 100 + this.progUp) >= 0) {
-            this.rank += 1;
-          }
-          // this.progUp -= 100;
-          this.progressCalc();
-        }
-        return [this.rank, this.progress];
+    if (Rank > this.rank) {
+      this.progUp = 10 * ((this.rank - Rank) ** 2);
+      if ((this.rank < 0) && (this.rank - Rank) > 100) {
+        this.progUp -= 100;
       }
-      if (this.rank > 0) {
-        this.progressCalc();
+
+      if (this.progUp < 100) {
+        this.progress = this.progUp;
+        return [this.progUp, this.rank, this.progress];
+      }
+
+      if (this.progUp > 99) {
+        // console.log('From line 48, progUp is ' + this.progUp);
+        return this.progrsCheck();
       }
     }
-    return [this.rank, this.progress];
+    return this.rank;
   }
 }
 
 // usage:
-const user = new User();
-// console.log(user.incProgress(-1));  // outputs  [90, -8, 90]
-// console.log(user.incProgress(-7));
-console.log(user.incProgress(-6));
+// const user = new User();
+// console.log(user.incProgress(-5));  // outputs  [90, -8, 90]
 
 module.exports = User;
-
-
-/*
-if (Rank > this.rank) {
-  this.progUp = 10 * ((this.rank - Rank) ** 2);
-  if ((this.rank < 0) && (this.rank - Rank) > 100) {
-    this.progUp -= 100;
-  }
-
-  if (this.progUp < 100) {
-    this.progress = this.progUp;
-    return [this.progUp, this.rank, this.progress];
-  }
-
-  if (this.progUp > 99) {
-    // console.log('From line 48, progUp is ' + this.progUp);
-    return this.progressCalc();
-  }
-}
-*/
-
 
 /*
 Write a class called User that is used to calculate the amount that a user will progress

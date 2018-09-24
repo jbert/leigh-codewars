@@ -7,8 +7,16 @@ const User = require('../style_ranking.js');
 
 describe('user.incProgress() should return Points, new Level and Progress through next level', function () {
   const tests = [
-    { args: '-7', expected: [10, -8, 10] },
-    
+    { args: '-7', expected: [-8, 10] },
+    { args: '-6', expected: [-8, 40] },
+    { args: '-5', expected: [-8, 90] },
+    { args: '-4', expected: [-7, 60] },
+    { args: '-3', expected: [-6, 50] },
+    { args: '-2', expected: [-5, 60] },
+    { args: '-1', expected: [-4, 90] },
+    { args: '1', expected: [-2, 40] },
+    { args: '2', expected: [1, 10] },
+    { args: '3', expected: [3, 0] },
   ];
   tests.forEach(function (test) {
     it(`Checks incProgress() ${test.args} is ${test.expected}`, function () {
