@@ -1,110 +1,137 @@
-// yet to solve!
-
-// TODO: create the User class/object
-// it must support rank, progress and the incProgress(rank) method
-
-// TODO: Replace examples and use TDD development by writing your own tests
-
-// You can also use Chai (http://chaijs.com/) by requiring it yourself
-// var expect = require("chai").expect;
-// var assert = require("chai").assert;
-// require("chai").should();
+// Instructions & business rules below code
+// rank is the current rank, Rank parameter is the new level of Codewars level completed
 
 class User {
   constructor(Rank) {
+    this.Rank = Rank;
     if (!this.rank) {
       this.rank = -8;
     }
     if (!this.progress) {
       this.progress = 0;
     }
-    this.Rank = Rank;
     this.progUp = 0;
   }
 
+  // does the final calc once progUp known
   progressCalc() {
-    const upLevel = Math.floor(this.progUp / 100);
-    this.progress = this.progress + (this.progUp % 100);
-
-    this.rank += upLevel;
-    // console.log('From line 29, uplevel ' + upLevel);
-    // console.log('From line 30, rank is now ' + this.rank);
-    // console.log('From line 30, this.progress ' + this.progress);
+    this.progress = this.progress + this.progUp;
+    if (this.progress < 100) {
+      return [this.rank, this.progress];
+    }
+    if (this.progress >= 100) {
+      this.rank += Math.floor(this.progress / 100);
+      this.progress = (this.progress % 100);
+      if (this.rank === 8) {
+        this.progress = 0;
+      }
+      return [this.rank, this.progress];
+    }
     return [this.rank, this.progress];
   }
 
-
-  incProgress(Rank) {
-    if (!((Rank >= -8) && (Rank <= 8))) {
-      return Error();
-    }
-    if (Rank <= this.rank) {
-      return [this.rank, this.progress];
+  // checking if rank going to pass through level zero in which case need to alter for no level 0
+  levelProgressCalc() {
+    if ((this.rank < 0) && (this.progress + this.progUp < 100)) {
+      return this.progressCalc();
     }
 
-    this.progUp = (10 * ((this.rank - Rank) ** 2));
-
-    if (this.progUp < 100) {
-      this.progress += this.progUp;
-      return [this.rank, this.progress];
-    }
-
-    if (this.progUp > 100) {
-      if (this.rank < 0) {
-        if ((this.rank * 100 + this.progUp) < 0) {
-          this.progressCalc();
-          return [this.rank, this.progress];
-        }
-        if ((this.rank * 100 + this.progUp) >= 0) {
-          this.progUp = (this.progress) + (10 * ((Rank - this.rank - 1) ** 2));
-          if ((this.rank * 100 + this.progUp) >= 0) {
-            this.rank += 1;
-          }
-          // this.progUp -= 100;
-          this.progressCalc();
-        }
-        return [this.rank, this.progress];
+    if ((this.rank < 0) && (this.progress + this.progUp >= 100)) {
+      if (100 * (-this.rank) > (this.progress + this.progUp)) {
+        return this.progressCalc();
       }
-      if (this.rank > 0) {
-        this.progressCalc();
+      if (100 * (-this.rank) <= (this.progress + this.progUp)) {
+        this.rank += 1;
+        this.progUp -= 100;
+        if (this.rank === 0) {
+          this.rank = 1;
+        }
+        return this.progressCalc();
       }
+    }
+    if ((this.rank > 0) && (this.Rank > this.rank)) {
+      return this.progressCalc();
     }
     return [this.rank, this.progress];
+  }
+
+  // where Rank is same as current rank (+3 pts) or one below (+1 pt)
+  similarLevelCalc(Rank) {
+    if (this.rank === Rank) {
+      this.progUp = 3;
+    }
+    if (this.rank === (this.Rank - 1)) {
+      this.progUp = 1;
+    }
+    return this.levelProgressCalc();
+  }
+
+  // where current rank < 0 and Rank > 0 to account for zero level modifier
+  levelZeroPassCalc(Rank) {
+    this.progUp = 10 * ((this.rank + Rank - 1) ** 2);
+    if (this.rank + Rank - 1 === 0) {
+      this.progUp = 10 * ((this.rank + Rank + 1) ** 2);
+    }
+    return this.levelProgressCalc();
+  }
+
+  // main function
+  // throw error for invalid argument
+  incProgress(Rank) {
+    if (!((Rank >= -8) && (Rank <= 8) && (Rank !== 0))) {
+      throw new Error();
+    }
+    // case where rank is positive integer and Rank is -1
+    if (this.rank > 0 && Rank < 0 && this.rank - Rank === 2) {
+      this.progUp = 1;
+      return this.progressCalc();
+    }
+    // case where Rank is lower than 1 level below return current values
+    if (this.rank - Rank > 1) {
+      return [this.rank, this.progress];
+    }
+    // case where rank is lower than 0 and Rank > zero to handle the absence of zero level
+    if ((this.rank < 0) && (Rank > 0)) {
+      return this.levelZeroPassCalc(Rank);
+    }
+    // case where Rank is same as rank or 1 level below
+    if (this.rank === (Rank || (Rank - 1))) {
+      return this.similarLevelCalc(Rank);
+    }
+    // for normal positive integer rank and positive Rank scenarios
+    if ((this.rank > 0) && (Rank > this.rank)) {
+      this.progUp = 10 * ((this.rank - Rank) ** 2);
+      return this.progressCalc(Rank);
+    }
+    // for all other cases
+    this.progUp = 10 * ((this.rank - Rank) ** 2);
+    return this.levelProgressCalc(Rank);
   }
 }
 
-// usage:
-const user = new User();
-// console.log(user.incProgress(-1));  // outputs  [90, -8, 90]
-// console.log(user.incProgress(-7));
-console.log(user.incProgress(-6));
-
+// for test
 module.exports = User;
 
-
-/*
-if (Rank > this.rank) {
-  this.progUp = 10 * ((this.rank - Rank) ** 2);
-  if ((this.rank < 0) && (this.rank - Rank) > 100) {
-    this.progUp -= 100;
-  }
-
-  if (this.progUp < 100) {
-    this.progress = this.progUp;
-    return [this.progUp, this.rank, this.progress];
-  }
-
-  if (this.progUp > 99) {
-    // console.log('From line 48, progUp is ' + this.progUp);
-    return this.progressCalc();
-  }
-}
-*/
+// usage:
+// const user = new User();
+// console.log(user.incProgress(-8));
+// console.log(user.incProgress(-8));
+// console.log(user.incProgress(6));
 
 
 /*
 Write a class called User that is used to calculate the amount that a user will progress
 through a ranking system similar to the one Codewars uses.
+
+TODO: create the User class/object
+It must support rank, progress and the incProgress(rank) method
+
+TODO: Replace examples and use TDD development by writing your own tests
+
+You can also use Chai (http://chaijs.com/) by requiring it yourself
+var expect = require("chai").expect;
+var assert = require("chai").assert;
+require("chai").should();
 
 Business Rules:
 A user starts at rank -8 and can progress all the way to 8.
