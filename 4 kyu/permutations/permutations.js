@@ -78,5 +78,5 @@ function permutations(string) {
   return uniqArry;
 }
 
-// console.log(permutations('abcd'));
+// usage: console.log(permutations('abcd'));
 module.exports = permutations;

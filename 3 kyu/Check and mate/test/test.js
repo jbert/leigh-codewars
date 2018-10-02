@@ -1,8 +1,10 @@
 /* eslint-env mocha */
 /* eslint-disable prefer-arrow-callback, func-names */
 
+import '../Check and mate';
+// reverse = require('../Check and mate');
+
 const { expect } = require('chai');
-const reverse = require('../The soul of wit reverse an array');
 
 describe('reverse() should reverse input array', function () {
   const tests = [
