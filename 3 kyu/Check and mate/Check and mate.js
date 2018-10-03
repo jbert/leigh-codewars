@@ -1,4 +1,16 @@
-// Instructions below
+// Kata instructions at the bottom
+
+// pseudo code/ functional hierarchy: isCheck runs, buildBoard builds the board and
+// stores positions in arrays. threatCheck checks the player under threat
+// buildThreats builds array of threats. checkCheck finds King position and checks if
+// in array of squares under threat. Build a Map of threats, parse into chckObj {}
+// push to board.check and return board.check
+
+// namespace necessary to share data between 2 functions in same scope (pre-set by Codewars)
+// preferable over code repetition (not DRY best practice)
+// in production another option is IIFE style module pattern and
+// return public API with private closured data
+const MYAPP = global.MYAPP || {};
 
 // Returns an array of threats if the arrangement of the pieces is check, otherwise false
 function isCheck(pieces, Player) {
@@ -15,9 +27,21 @@ function isCheck(pieces, Player) {
     buildBoard() {
       pieces.forEach((p) => {
         if (p.owner === 0) {
-          this.player0Pieces.push([p.piece, 0, p.x, p.y, p.prevX, p.prevY]);
+          this.player0Pieces.push([p.piece, 0, p.x, p.y]);
+          if (p.prevX !== undefined) {
+            this.player0Pieces.push(p.prevX);
+          }
+          if (p.prevY !== undefined) {
+            this.player0Pieces.push(p.prevY);
+          }
         } else if (p.owner === 1) {
-          this.player1Pieces.push([p.piece, 1, p.x, p.y, p.prevX, p.prevY]);
+          this.player1Pieces.push([p.piece, 1, p.x, p.y]);
+          if (p.prevX !== undefined) {
+            this.player1Pieces.push(p.prevX);
+          }
+          if (p.prevY !== undefined) {
+            this.player1Pieces.push(p.prevY);
+          }
         }
       });
       // console.log(this.player0Pieces);
@@ -206,6 +230,9 @@ function isCheck(pieces, Player) {
       }
       // console.log('this.threats');
       // console.log(this.threats);
+      MYAPP.threats = this.threats;
+      MYAPP.player0Pieces = this.player0Pieces;
+      MYAPP.player1Pieces = this.player1Pieces;
       return (this.threats);
     }
   }
@@ -218,19 +245,23 @@ function isCheck(pieces, Player) {
     let arr;
     let plyr = 0;
     (Player === 0) ? arr = board.player0Pieces : arr = board.player1Pieces;
-
+    // find the king's position of player who's turn it is
     for (let j = 0; j < arr.length; j++) {
       if (arr[j][0] === 'king') {
         kingX = arr[j][2];
         kingY = arr[j][3];
       }
     }
-    // console.log(kingX, kingY);
+    // for use by isMate();
+    MYAPP.kingX = kingX;
+    MYAPP.kingY = kingY;
+    // if threatened square equals king's square
     for (let l = 0; l < board.threats.length; l++) {
       if (board.threats[l][1] === kingX && board.threats[l][2] === kingY) {
         if (Player === 0) {
           plyr = 1;
         }
+        // build a Map of threats
         const map = new Map([['piece', board.threats[l][0][0]], ['owner', plyr], ['x', board.threats[l][0][2]], ['y', board.threats[l][0][3]]]);
         if (board.threats[l][0][4] !== undefined) {
           map.set('prevX', board.threats[l][0][4]);
@@ -239,26 +270,9 @@ function isCheck(pieces, Player) {
           map.set('prevY', board.threats[l][0][5]);
         }
 
-        /*
-        const chkObj = {};
-        for (const [key, value] of map) {
-          Object.assign(chkObj, [key, value]);
-        }
-        */
         const chkObj = Array.from(map).reduce((chkObj, [key, value]) => (
           Object.assign(chkObj, { [key]: value })), {});
-        /*
-        const chkObj = Object.assign({
-          piece: board.threats[l][0][0],
-          owner: plyr,
-          x: board.threats[l][0][2],
-          y: board.threats[l][0][3],
-          [(board.threats[l][0][4] === undefined) ? null : 'prevX']: board.threats[l][0][4],
-          [(board.threats[l][0][5] === undefined) ? null : 'prevY']: board.threats[l][0][5],
-        });
-        */
-        // console.log(map);
-        // console.log(chkObj);
+
         (board.check).push(chkObj);
       }
     }
@@ -267,33 +281,106 @@ function isCheck(pieces, Player) {
 
   board.buildBoard(pieces);
   checkCheck();
-  return board.check;
+  // return board.check or if player's King not in check return false
+  if (board.check.length !== 0) {
+    return board.check;
+  }
+  return false;
 }
 
-pieces = [
+let pieces = [
   {piece: "king", owner: 1, x: 4, y: 0},
+  {piece: "queen", owner: 1, x: 7, y: 4, prevX: 3, prevY: 0},
   {piece: "king", owner: 0, x: 4, y: 7},
-  {piece: "rook", owner: 1, x: 4, y: 1, prevX: 2, prevY: 1},
-  {piece: "queen", owner: 1, x: 2, y: 7},
-  {piece: 'knight', owner: 1, x: 3, y: 5 },
+  {piece: "pawn", owner: 0, x: 6, y: 4},
+  {piece: "pawn", owner: 0, x: 5, y: 5},
+  {piece: "pawn", owner: 0, x: 4, y: 6},
+  {piece: "pawn", owner: 0, x: 3, y: 6},
+  {piece: "pawn", owner: 0, x: 7, y: 6},
+  {piece: "rook", owner: 0, x: 7, y: 7},
+  {piece: 'knight', owner: 0, x: 6, y: 7},
+  {piece: "bishop", owner: 0, x: 5, y: 7},
+  // {piece: "queen", owner: 0, x: 3, y: 7},
 ];
 
-console.log(isCheck(pieces, 0));
-
-/*
-function isCheck(pieces, player) {
-}
-
-// Returns true if the arrangement of the
-// pieces is a check mate, otherwise false
 function isMate(pieces, player) {
+  // check if King has any moves that can take out of check, ie within board range, not a square
+  // occupied by one of own pieces or a square in threats array
+  function validKingMoves() {
+    const kingMoves = [];
+    const x = MYAPP.kingX;
+    const y = MYAPP.kingY;
+    if ((x - 1) >= 0) {
+      kingMoves.push([x - 1, y]);
+      if ((y - 1) >= 0) {
+        kingMoves.push([x - 1, y - 1]);
+      }
+      if ((y + 1) <= 7) {
+        kingMoves.push([x - 1, y + 1]);
+      }
+    }
+    if ((y - 1) >= 0) {
+      kingMoves.push([x, y - 1]);
+      if ((x + 1) <= 7) {
+        kingMoves.push([x + 1, y - 1]);
+      }
+    }
+    if ((y + 1) <= 7) {
+      kingMoves.push([x, y + 1]);
+      if ((x + 1) <= 7) {
+        this.threats.push([x + 1, y + 1]);
+      }
+    }
+    if ((x + 1) <= 7) {
+      kingMoves.push([x + 1, y]);
+    }
+    // find positions of all player's current pieces
+    let arr;
+    (player === 0) ? arr = MYAPP.player0Pieces : arr = MYAPP.player1Pieces;
+    let Arr = [];
+    for (let i = 0; i < arr.length; i++) {
+      Arr.push([arr[i][2], arr[i][3]]);
+    }
+    // JSON.stringify to compare arrays, kingMoves is possible moves, Arr is array of other pieces
+    const possMovesAvail = (kingMoves.filter((elem) => {
+      const possMove = JSON.stringify(elem);
+      for (let i = 0; i < Arr.length; i++) {
+        const pieceAtSquare = JSON.stringify(Arr[i]);
+        if (possMove === pieceAtSquare) {
+          return false;
+        }
+      }
+      return true;
+    }));
+    // check movesAvail by King and see if exists in threat array, return those that don't or []
+    const validEscapeMoves = (possMovesAvail.filter((elem) => {
+      const move = JSON.stringify(elem);
+      for (let i = 0; i < MYAPP.threats.length; i++) {
+        const threatSqArr = [];
+        MYAPP.threats.forEach(threat => threatSqArr.push([threat[1], threat[2]]));
+        const thretSq = JSON.stringify(threatSqArr[i]);
+        if (move === thretSq) {
+          return false;
+        }
+      }
+      return true;
+    }));
+    // console.log(MYAPP.threats);
+    // console.log(validEscapeMove);
+    if (validEscapeMoves.length !== 0) {
+      return validEscapeMoves;
+    }
+    return [];
+  }
+
+  return validKingMoves();
+
+  // return false;
 }
-*/
 
+console.log(isCheck(pieces, 0));
+console.log(isMate(pieces, 0));
 
-//
-
-// expected: [{ piece: \'pawn\', owner: 1, x: 5, y: 6 }]
 
 /*
 In this kata, you have to implement two functions: isCheck and isMate.
