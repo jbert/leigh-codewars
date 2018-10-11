@@ -10,7 +10,7 @@
 // preferable over code repetition (not DRY best practice)
 // in production another option is IIFE style module pattern and
 // return public API with private closured data
-const MYAPP = global.MYAPP || {};
+const CHESSAPP = global.CHESSAPP || {};
 
 // Returns an array of threats if the arrangement of the pieces is check, otherwise false
 function isCheck(pieces, Player) {
@@ -27,21 +27,9 @@ function isCheck(pieces, Player) {
     buildBoard() {
       pieces.forEach((p) => {
         if (p.owner === 0) {
-          this.player0Pieces.push([p.piece, 0, p.x, p.y]);
-          if (p.prevX !== undefined) {
-            this.player0Pieces.push(p.prevX);
-          }
-          if (p.prevY !== undefined) {
-            this.player0Pieces.push(p.prevY);
-          }
+          this.player0Pieces.push([p.piece, 0, p.x, p.y, p.prevX, p.prevY]);
         } else if (p.owner === 1) {
-          this.player1Pieces.push([p.piece, 1, p.x, p.y]);
-          if (p.prevX !== undefined) {
-            this.player1Pieces.push(p.prevX);
-          }
-          if (p.prevY !== undefined) {
-            this.player1Pieces.push(p.prevY);
-          }
+          this.player1Pieces.push([p.piece, 1, p.x, p.y, p.prevX, p.prevY]);
         }
       });
       // console.log(this.player0Pieces);
@@ -230,9 +218,9 @@ function isCheck(pieces, Player) {
       }
       // console.log('this.threats');
       // console.log(this.threats);
-      MYAPP.threats = this.threats;
-      MYAPP.player0Pieces = this.player0Pieces;
-      MYAPP.player1Pieces = this.player1Pieces;
+      CHESSAPP.threats = this.threats;
+      CHESSAPP.player0Pieces = this.player0Pieces;
+      CHESSAPP.player1Pieces = this.player1Pieces;
       return (this.threats);
     }
   }
@@ -253,8 +241,8 @@ function isCheck(pieces, Player) {
       }
     }
     // for use by isMate();
-    MYAPP.kingX = kingX;
-    MYAPP.kingY = kingY;
+    CHESSAPP.kingX = kingX;
+    CHESSAPP.kingY = kingY;
     // if threatened square equals king's square
     for (let l = 0; l < board.threats.length; l++) {
       if (board.threats[l][1] === kingX && board.threats[l][2] === kingY) {
@@ -288,28 +276,13 @@ function isCheck(pieces, Player) {
   return false;
 }
 
-let pieces = [
-  {piece: "king", owner: 1, x: 4, y: 0},
-  {piece: "queen", owner: 1, x: 7, y: 4, prevX: 3, prevY: 0},
-  {piece: "king", owner: 0, x: 4, y: 7},
-  {piece: "pawn", owner: 0, x: 6, y: 4},
-  {piece: "pawn", owner: 0, x: 5, y: 5},
-  {piece: "pawn", owner: 0, x: 4, y: 6},
-  {piece: "pawn", owner: 0, x: 3, y: 6},
-  {piece: "pawn", owner: 0, x: 7, y: 6},
-  {piece: "rook", owner: 0, x: 7, y: 7},
-  {piece: 'knight', owner: 0, x: 6, y: 7},
-  {piece: "bishop", owner: 0, x: 5, y: 7},
-  // {piece: "queen", owner: 0, x: 3, y: 7},
-];
-
 function isMate(pieces, player) {
   // check if King has any moves that can take out of check, ie within board range, not a square
   // occupied by one of own pieces or a square in threats array
   function validKingMoves() {
     const kingMoves = [];
-    const x = MYAPP.kingX;
-    const y = MYAPP.kingY;
+    const x = CHESSAPP.kingX;
+    const y = CHESSAPP.kingY;
     if ((x - 1) >= 0) {
       kingMoves.push([x - 1, y]);
       if ((y - 1) >= 0) {
@@ -335,29 +308,32 @@ function isMate(pieces, player) {
       kingMoves.push([x + 1, y]);
     }
     // find positions of all player's current pieces
-    let arr;
-    (player === 0) ? arr = MYAPP.player0Pieces : arr = MYAPP.player1Pieces;
-    let Arr = [];
-    for (let i = 0; i < arr.length; i++) {
-      Arr.push([arr[i][2], arr[i][3]]);
+    let allPieces;
+    (player === 0) ? allPieces = CHESSAPP.player0Pieces : allPieces = CHESSAPP.player1Pieces;
+    const piecesXY = [];
+    for (let i = 0; i < allPieces.length; i++) {
+      piecesXY.push([allPieces[i][2], allPieces[i][3]]);
     }
-    // JSON.stringify to compare arrays, kingMoves is possible moves, Arr is array of other pieces
+    console.log('kingMoves');
+    console.log(kingMoves);
+    // remove each of player's other pieces in array (Arr) from King's moves array (kingMoves)
     const possMovesAvail = (kingMoves.filter((elem) => {
       const possMove = JSON.stringify(elem);
-      for (let i = 0; i < Arr.length; i++) {
-        const pieceAtSquare = JSON.stringify(Arr[i]);
+      for (let i = 0; i < piecesXY.length; i++) {
+        const pieceAtSquare = JSON.stringify(piecesXY[i]);
         if (possMove === pieceAtSquare) {
           return false;
         }
       }
       return true;
     }));
-    // check movesAvail by King and see if exists in threat array, return those that don't or []
+    console.log(possMovesAvail);
+    // check possMovesAvail by King and see if exists in threat array, return those that don't
     const validEscapeMoves = (possMovesAvail.filter((elem) => {
       const move = JSON.stringify(elem);
-      for (let i = 0; i < MYAPP.threats.length; i++) {
+      for (let i = 0; i < CHESSAPP.threats.length; i++) {
         const threatSqArr = [];
-        MYAPP.threats.forEach(threat => threatSqArr.push([threat[1], threat[2]]));
+        CHESSAPP.threats.forEach(threat => threatSqArr.push([threat[1], threat[2]]));
         const thretSq = JSON.stringify(threatSqArr[i]);
         if (move === thretSq) {
           return false;
@@ -365,19 +341,30 @@ function isMate(pieces, player) {
       }
       return true;
     }));
-    // console.log(MYAPP.threats);
-    // console.log(validEscapeMove);
+    console.log('validEscapeMoves');
+    console.log(validEscapeMoves);
     if (validEscapeMoves.length !== 0) {
-      return validEscapeMoves;
+      return false;
     }
-    return [];
+    return true;
   }
-
   return validKingMoves();
-
-  // return false;
 }
 
+const pieces = [
+  { piece: 'king', owner: 1, x: 4, y: 0 },
+  { piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 },
+  { piece: 'king', owner: 0, x: 4, y: 7 },
+  { piece: 'pawn', owner: 0, x: 7, y: 4 },
+  { piece: 'pawn', owner: 0, x: 6, y: 5 },
+  { piece: 'pawn', owner: 0, x: 7, y: 6 },
+  { piece: 'pawn', owner: 0, x: 4, y: 6 },
+  { piece: 'pawn', owner: 0, x: 3, y: 6 },
+  { piece: 'rook', owner: 0, x: 7, y: 7 },
+  { piece: 'bishop', owner: 0, x: 5, y: 7 },
+  { piece: 'knight', owner: 0, x: 6, y: 7 },
+  { piece: 'queen', owner: 0, x: 3, y: 7 },
+];
 console.log(isCheck(pieces, 0));
 console.log(isMate(pieces, 0));
 
@@ -443,4 +430,37 @@ or values of the pieces contained within it.
 Note 2: the tests might not imply explicitly why a certain position is or isn't a check or mate.
 If your code fails a test, you have to be able to analyze the situation and see which pieces are to
 blame. If all else fails, try asking for help at the discussion board
+*/
+
+/* testing
+
+const pieces = [
+  { piece: 'king', owner: 1, x: 0, y: 4 },
+  { piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 },
+  { piece: 'king', owner: 0, x: 4, y: 7 },
+  { piece: 'pawn', owner: 0, x: 7, y: 4 },
+  { piece: 'pawn', owner: 0, x: 6, y: 5 },
+  { piece: 'pawn', owner: 0, x: 7, y: 6 },
+  { piece: 'pawn', owner: 0, x: 4, y: 6 },
+  { piece: 'pawn', owner: 0, x: 3, y: 6 },
+  { piece: 'rook', owner: 0, x: 7, y: 7 },
+  { piece: 'bishop', owner: 0, x: 5, y: 7 },
+  { piece: 'knight', owner: 0, x: 6, y: 7 },
+];   // queen threatens, not mate
+
+const pieces = [
+  { piece: 'king', owner: 1, x: 4, y: 0 },
+  { piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 },
+  { piece: 'king', owner: 0, x: 4, y: 7 },
+  { piece: 'pawn', owner: 0, x: 7, y: 4 },
+  { piece: 'pawn', owner: 0, x: 6, y: 5 },
+  { piece: 'pawn', owner: 0, x: 7, y: 6 },
+  { piece: 'pawn', owner: 0, x: 4, y: 6 },
+  { piece: 'pawn', owner: 0, x: 3, y: 6 },
+  { piece: 'rook', owner: 0, x: 7, y: 7 },
+  { piece: 'bishop', owner: 0, x: 5, y: 7 },
+  { piece: 'knight', owner: 0, x: 6, y: 7 },
+  { piece: 'queen', owner: 0, x: 3, y: 7 },
+];   // mate
+
 */

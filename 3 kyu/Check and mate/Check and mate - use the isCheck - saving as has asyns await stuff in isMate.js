@@ -276,7 +276,99 @@ function isCheck(pieces, Player) {
   return false;
 }
 
+function isMate(pieces, player) {
+  const kingMoves = [];
+  const ownPiecesXY = [];
+  const threats = [];
+  // check if King has any moves that can take out of check, ie within board range, not a square
+  // occupied by one of own pieces or a square in threats array
+  (function possKingMoves() {
+    const x = CHESSAPP.kingX;
+    const y = CHESSAPP.kingY;
 
+    if ((x - 1) >= 0) {
+      kingMoves.push([x - 1, y]);
+      if ((y - 1) >= 0) {
+        kingMoves.push([x - 1, y - 1]);
+      }
+      if ((y + 1) <= 7) {
+        kingMoves.push([x - 1, y + 1]);
+      }
+    }
+    if ((y - 1) >= 0) {
+      kingMoves.push([x, y - 1]);
+      if ((x + 1) <= 7) {
+        kingMoves.push([x + 1, y - 1]);
+      }
+    }
+    if ((y + 1) <= 7) {
+      kingMoves.push([x, y + 1]);
+      if ((x + 1) <= 7) {
+        this.threats.push([x + 1, y + 1]);
+      }
+    }
+    if ((x + 1) <= 7) {
+      kingMoves.push([x + 1, y]);
+    }
+  }());
+
+  (function buildOwnPiecesArr() {
+    let allPieces;
+    (player === 0) ? allPieces = CHESSAPP.player0Pieces : allPieces = CHESSAPP.player1Pieces;
+    for (let i = 0; i < allPieces.length; i++) {
+      ownPiecesXY.push([allPieces[i][2], allPieces[i][3]]);
+    }
+  }());
+  // find positions of all player's current pieces
+
+  (function buildThreats() {
+    for (let j = 0; j < CHESSAPP.threats.length; j++) {
+      threats.push([CHESSAPP.threats[j][1], CHESSAPP.threats[j][2]]);
+    }
+  }());
+
+  function arrayCheckUtil(arr1, arr2) {
+    const Arr1 = arr1;
+    const Arr2 = arr2;
+    const validMoves = function validMvs() {
+      for (let i = 0; i < Arr1.length; i++) {
+        const kingMove = Arr1[i].toString();
+        for (let j = 0; j < Arr2.length; j++) {
+          const thret = Arr2[j].toString();
+          if (kingMove === thret) {
+            // console.log(kingMove);
+            // console.log(pice);
+            Arr1.splice(i, 1);
+            --i;
+            break;
+          }
+        }
+      }
+      // console.log(Arr1);
+      return Arr1;
+    };
+    return validMoves();
+  }
+
+  async function validMoveReducer() {
+    const kingMvsMinusownPieces = await arrayCheckUtil(kingMoves, ownPiecesXY);
+    const finalPossibleMoves = await arrayCheckUtil(kingMvsMinusownPieces, threats);
+    console.log('finalPossibleMoves');
+    console.log(finalPossibleMoves);
+    return finalPossibleMoves;
+  }
+
+  async function anyValidMovesLeft() {
+    const Total = await validMoveReducer();
+    // console.log(Total.length);
+    return (Total.length === 0);
+    // return true;
+  }
+  anyValidMovesLeft().then((res) => {
+    console.log(res + 'from here');
+    return res;
+  });
+}
 
 const pieces = [
   { piece: 'king', owner: 1, x: 4, y: 0 },
