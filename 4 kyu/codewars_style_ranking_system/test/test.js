@@ -42,14 +42,12 @@ describe('user.incProgress() should return Points, new Level and Progress throug
   tests.forEach(function (test) {
     it(`Checks incProgress() ${test.args} is ${test.expected}`, function () {
       const res = user.incProgress(test.args);
-      function returnResult() {
+      function awaiter() {
         expect(res).to.eql(test.expected);
       }
-      // the code being tested doesn't require a setTimeout, however Mocha returns
-      // before it's had chance to run
-      setTimeout(function () {
-        returnResult();
-      }, 1000);
+      setTimeout(() => {
+        awaiter();
+      }, 500);
     });
   });
 });
