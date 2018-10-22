@@ -115,8 +115,7 @@ module.exports = User;
 // usage:
 // const user = new User();
 // console.log(user.incProgress(-8));
-// console.log(user.incProgress(-8));
-// console.log(user.incProgress(6));
+// console.log(user.incProgress(-7));
 
 
 /*

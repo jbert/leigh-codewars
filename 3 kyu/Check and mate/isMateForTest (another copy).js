@@ -301,8 +301,8 @@ function isMate(Pieces, Player) {
 
       // could refactor the following 'check blocking' functions as very similar although can more easily see what the program is doing kept separate
       // also in 2nd func need to log player's piece as fixed if being in situe blocks an opponents check, player is unable to move it
-      (function isPlayerBlockingApproachVector() {
-        const playerPieces = (board.player === 0) ? board.state.player0Pieces : board.state.player1Pieces;
+      (function isAttackerBlockingApproachVector() {
+        const playerPieces = (board.player === 0) ? board.state.player1Pieces : board.state.player0Pieces;
         const attackV = Array.from(attackVectors);
         for (let i = 0; i < attackV.length; i++) {
           const holdingArray = [];
@@ -321,12 +321,12 @@ function isMate(Pieces, Player) {
             }
           }
         }
-        if (board.state.inCheckArr.length === 2) {
+        if (board.state.inCheckArr.length === 0) {
           const thisBoard = board;
           thisBoard.state.isMate = false;
         }
       }());
-
+      // is defender already blocking a potential checking piece if moved
       (function isPlayerBlockingApproachVector() {
         const playerPieces = (board.player === 0) ? board.state.player0Pieces : board.state.player1Pieces;
         const attackV = Array.from(attackVectors);
@@ -466,7 +466,7 @@ function isMate(Pieces, Player) {
       }
       if (availMoves.length === 0) {
         this.ableToTakeorBlockOpponentsCheckingPiece();
-      } // minus squares already under threat by opponent's pieces
+      } // minus from availMove squares already under threat by opponent's pieces
       if (availMoves.length > 0) {
         this.minusThreatenedSquares(availMoves);
       }
@@ -478,31 +478,32 @@ function isMate(Pieces, Player) {
     const protoSquaresInRangeFactory = {
       // buildAll func to build all, although can use components separately
       // playr useful to mock in unit testing (dependency injection)
-      buildAll(piecesArray, playr) {
-        const totalThreatsorDefendableSquaresArray = [];
+      buildAll(piecesArray, playr, initialMovePseudoOverloading) {
+        const pieceThreatsorDefendableSquaresArray = [];
         for (let i = 0; i < piecesArray.length; i++) {
           if (piecesArray[i].piece === 'king') {
-            this.buildInRangeOfKing(piecesArray[i], totalThreatsorDefendableSquaresArray);
+            this.buildInRangeOfKing(piecesArray[i], pieceThreatsorDefendableSquaresArray);
           }
           if (piecesArray[i].piece === 'pawn') {
-            this.buildInRangeOfPawn(piecesArray[i], playr, totalThreatsorDefendableSquaresArray);
+            this.buildInRangeOfPawn(piecesArray[i], playr, pieceThreatsorDefendableSquaresArray, initialMovePseudoOverloading);
           }
           if (piecesArray[i].piece === 'knight') {
-            this.buildInRangeOfKnight(piecesArray[i], totalThreatsorDefendableSquaresArray);
+            this.buildInRangeOfKnight(piecesArray[i], pieceThreatsorDefendableSquaresArray);
           }
           if (piecesArray[i].piece === 'rook') {
-            this.buildInRangeOfRook(piecesArray[i], totalThreatsorDefendableSquaresArray);
+            this.buildInRangeOfRook(piecesArray[i], pieceThreatsorDefendableSquaresArray);
           }
           if (piecesArray[i].piece === 'bishop') {
-            this.buildInRangeOfBishop(piecesArray[i], totalThreatsorDefendableSquaresArray);
+            this.buildInRangeOfBishop(piecesArray[i], pieceThreatsorDefendableSquaresArray);
           }
           if (piecesArray[i].piece === 'queen') {
-            this.buildInRangeOfQueen(piecesArray[i], totalThreatsorDefendableSquaresArray);
+            this.buildInRangeOfQueen(piecesArray[i], pieceThreatsorDefendableSquaresArray);
           }
         }
-        return totalThreatsorDefendableSquaresArray;
+        return pieceThreatsorDefendableSquaresArray;
       },
-      buildInRangeOfKing(kingObj, tToDSA) {
+      // abbrev: pieceThreatsorDefendableSquaresArray to pToDSA when used as params
+      buildInRangeOfKing(kingObj, pToDSA) {
         // squares in range of king
         const inRange = [];
         const { x } = kingObj;
@@ -531,10 +532,17 @@ function isMate(Pieces, Player) {
         if (y + 1 < 8) {
           inRange.push([x, y + 1]);
         }
-        tToDSA.push([kingObj, inRange]);
+        pToDSA.push([kingObj, inRange]);
         return inRange;
       },
-      buildInRangeOfPawn(pawnObj, playr, tToDSA) {
+      buildInRangeOfPawn(pawnObj, playr, pToDSA, initialMovePseudoOverloading) {
+        // could separate pawns differing functionaility eg enPassant to another function
+        if (initialMovePseudoOverloading === 'initialMove') {
+          const { x } = pawnObj;
+          const { y } = pawnObj;
+          return (playr === 0) ? [[x, y - 1], [x, y - 2]] : [[x, y + 1], [y, y + 2]];
+        }
+
         // in range of pawns
         const inRange = [];
         const { x } = pawnObj;
@@ -557,9 +565,10 @@ function isMate(Pieces, Player) {
             inRange.push([x + 1, y - 1]);
           }
         }
-        tToDSA.push([pawnObj, inRange]);
+        pToDSA.push([pawnObj, inRange]);
+        return pToDSA;
       },
-      buildInRangeOfKnight(knightObj, tToDSA) {
+      buildInRangeOfKnight(knightObj, pToDSA) {
         // squares in range of knight
         const inRange = [];
         const { x } = knightObj;
@@ -588,9 +597,9 @@ function isMate(Pieces, Player) {
         if ((x + 1) <= 7 && (y + 2) <= 7) {
           inRange.push([x + 1, y + 2]);
         }
-        tToDSA.push([knightObj, inRange]);
+        pToDSA.push([knightObj, inRange]);
       },
-      buildInRangeOfRook(rookObj, tToDSA) {
+      buildInRangeOfRook(rookObj, pToDSA) {
         // squares in range of rook
         const inRange = [];
         const { x } = rookObj;
@@ -613,9 +622,9 @@ function isMate(Pieces, Player) {
             inRange.push([x, y + k]);
           }
         }
-        tToDSA.push([rookObj, inRange]);
+        pToDSA.push([rookObj, inRange]);
       },
-      buildInRangeOfBishop(bishopObj, tToDSA) {
+      buildInRangeOfBishop(bishopObj, pToDSA) {
         // squares in range of rook
         const inRange = [];
         const { x } = bishopObj;
@@ -636,9 +645,9 @@ function isMate(Pieces, Player) {
             inRange.push([x - i, y + i]);
           }
         }
-        tToDSA.push([bishopObj, inRange]);
+        pToDSA.push([bishopObj, inRange]);
       },
-      buildInRangeOfQueen(queenObj, tToDSA) {
+      buildInRangeOfQueen(queenObj, pToDSA) {
         // squares in range of queen => inRangeOfRook + inRangeOfBishop combined
         const inRange = [];
         const { x } = queenObj;
@@ -677,7 +686,7 @@ function isMate(Pieces, Player) {
             inRange.push([x - i, y + i]);
           }
         }
-        tToDSA.push([queenObj, inRange]);
+        pToDSA.push([queenObj, inRange]);
       },
     };
     return Object.create(protoSquaresInRangeFactory);
@@ -701,7 +710,7 @@ function isMate(Pieces, Player) {
     return false;
   }
   board.removeAlreadyBlockedPiecesFromCheckArr(board);
-  // component usable from anywhere, resulting array passed in as argument
+  // buildinRangeofKing component reusable from anywhere, resulting array passed in as argument
   board.kingAbletoMovetoFreeSquare(boardThreatenedDefendedSquares.buildInRangeOfKing({ piece: 'king', x: board.state.defendingKingSquare[0], y: board.state.defendingKingSquare[1] }, []));
 
   return board.state.isMate;
@@ -709,23 +718,32 @@ function isMate(Pieces, Player) {
 
 module.exports = isMate;
 
-
-const pieces =  [ { piece: 'pawn', owner: 0, x: 6, y: 4 },
-{ piece: 'pawn', owner: 0, x: 5, y: 5 },
-{ piece: 'pawn', owner: 0, x: 3, y: 6 },
-{ piece: 'pawn', owner: 0, x: 4, y: 6 },
-{ piece: 'pawn', owner: 0, x: 7, y: 6 },
-{ piece: 'queen', owner: 0, x: 3, y: 7 },
-{ piece: 'king', owner: 0, x: 4, y: 7 },
-{ piece: 'bishop', owner: 0, x: 5, y: 7 },
-{ piece: 'knight', owner: 0, x: 6, y: 7 },
-{ piece: 'rook', owner: 0, x: 7, y: 7 },
-{ piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 },
-{ piece: 'king', owner: 1, x: 4, y: 0 } ];
+const pieces =[ { piece: 'king', owner: 1, x: 4, y: 0 },
+  { piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
+  { piece: 'queen', owner: 1, x: 0, y: 7 },
+  { piece: 'pawn', owner: 0, x: 4, y: 6 },
+  { piece: 'pawn', owner: 0, x: 5, y: 6 },
+  { piece: 'bishop', owner: 0, x: 3, y: 7 },
+  { piece: 'king', owner: 0, x: 4, y: 7 },
+  { piece: 'queen', owner: 0, x: 5, y: 7 },
+  { piece: 'pawn', owner: 0, x: 2, y: 6 } ]
+// Pawn 2,6 can intercept bishop by moving 1 forwards
 
 console.log(isMate(pieces, 0));
 
+/*
+const pieces =  [ { piece: 'king', owner: 1, x: 4, y: 0 },
+  { piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
+  { piece: 'queen', owner: 1, x: 0, y: 7 },
+  { piece: 'pawn', owner: 0, x: 4, y: 6 },
+  { piece: 'pawn', owner: 0, x: 5, y: 6 },
+  { piece: 'bishop', owner: 0, x: 3, y: 7 },
+  { piece: 'king', owner: 0, x: 4, y: 7 },
+  { piece: 'queen', owner: 0, x: 5, y: 7 },
+  { piece: 'pawn', owner: 0, x: 2, y: 6 } ];
 
+console.log(isCheck(pieces, 0));
+*/
 /*
 const pcs = [
   { piece: 'king', owner: 1, x: 4, y: 0 },
@@ -774,16 +792,7 @@ const pieces = [
   { piece: 'rook', owner: 0, x: 5, y: 7 } ]
   should not be a mate
 
-[ { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
-  { piece: 'queen', owner: 1, x: 0, y: 7 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'bishop', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'queen', owner: 0, x: 5, y: 7 },
-  { piece: 'pawn', owner: 0, x: 2, y: 6 } ]
-  Pawn 2,6 can intercept bishop by moving 1 forwards
+
 
 [ { piece: 'king', owner: 1, x: 4, y: 0 },
   { piece: 'bishop', owner: 1, x: 0, y: 3, prevX: 3, prevY: 0 },
