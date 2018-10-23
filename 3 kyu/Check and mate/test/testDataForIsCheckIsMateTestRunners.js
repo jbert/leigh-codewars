@@ -57,7 +57,6 @@ const tests = [
   { piece: 'king', owner: 0, x: 4, y: 7 },
   { piece: 'bishop', owner: 0, x: 5, y: 7 },
   { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'queen', owner: 1, x: 4, y: 1 },
   { piece: 'knight', owner: 1, x: 3, y: 5, prevX: 2, prevY: 3 } ], 0],
   isCheckExpected: [{ piece: 'knight', owner: 1, x: 3, y: 5, prevX: 2, prevY: 3 }],
   isMateExpected: false,
@@ -76,7 +75,7 @@ const tests = [
   { piece: 'rook', owner: 0, x: 7, y: 7 },
   { piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 },
   { piece: 'king', owner: 1, x: 4, y: 0 } ], 0],
-  isCheckExpected: [{ piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 } ],
+  isCheckExpected: [{ piece: 'queen', owner: 1, x: 7, y: 4, pdefendableSquaresrevX: 3, prevY: 0 } ],
   isMateExpected: true,
   testCase: 6,
   },
@@ -111,7 +110,7 @@ const tests = [
   { piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 },
   { piece: 'king', owner: 1, x: 4, y: 0 } ], 0],
   isCheckExpected: [{ piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 }],
-  isMateExpected: false,
+  isMateExpected: true,
   testCase: 8,
   },
 
@@ -203,16 +202,33 @@ const tests = [
   { piece: 'rook', owner: 1, x: 3, y: 6 } ], 0],
   isCheckExpected: [{ piece: 'queen', owner: 1, x: 3, y: 7, prevX: 2, prevY: 6 }],
   isMateExpected: true,
-  // explanation: should be a mate?
   testCase: 14,
   },
 
+  { args: [[ { piece: 'king', owner: 1, x: 4, y: 0 },
+  { piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
+  { piece: 'queen', owner: 1, x: 0, y: 7 },
+  { piece: 'pawn', owner: 0, x: 4, y: 6 },
+  { piece: 'pawn', owner: 0, x: 5, y: 6 },
+  { piece: 'rook', owner: 0, x: 1, y: 7 },
+  { piece: 'king', owner: 0, x: 4, y: 7 },
+  { piece: 'rook', owner: 0, x: 5, y: 7 },
+  { piece: 'rook', owner: 1, x: 3, y: 4 } ], 0],
+  isCheckExpected: [{ piece: 'pawn', owner: 0, x: 4, y: 4, prevX: 4, prevY: 6 }],
+  isMateExpected: true,
+  testCase: 15,
+  },
+
+]
+
+/*
+
   { args: [[ { piece: 'king', owner: 1, x: 5, y: 3 },
   { piece: 'pawn', owner: 0, x: 4, y: 4, prevX: 4, prevY: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
+  { piece: 'rook', owner: 0, x: 5, y: 6 },
   { piece: 'king', owner: 0, x: 4, y: 7 },
   { piece: 'knight', owner: 0, x: 2, y: 5 },
-  { piece: 'pawn', owner: 1, x: 3, y: 4 },
+  { piece: 'pawn', owner: 1, x: 5, y: 4 },
   { piece: 'knight', owner: 1, x: 3, y: 3 },
   { piece: 'pawn', owner: 1, x: 4, y: 3 },
   { piece: 'bishop', owner: 1, x: 4, y: 2 },
@@ -220,9 +236,11 @@ const tests = [
   { piece: 'queen', owner: 0, x: 6, y: 5 } ], 1],
   isCheckExpected: [{ piece: 'pawn', owner: 0, x: 4, y: 4, prevX: 4, prevY: 6 }],
   isMateExpected: false,
-  testCase: 15,
+  testCase: 16,
   },
 ];
+
+*/
 
 module.exports = tests;
 
