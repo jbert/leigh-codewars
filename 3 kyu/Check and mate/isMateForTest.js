@@ -69,9 +69,8 @@ function isMate(Pieces, Player) {
         }
         return tmpArr;
       })();
-    
-      allPiecesArr = [...arr1, ...arr2];
 
+      allPiecesArr = [...arr1, ...arr2];
       this.state.allPieces.push(allPiecesArr);
 
       // build approach vector between defending piece and checking attacker
@@ -103,22 +102,22 @@ function isMate(Pieces, Player) {
       }
       if (defendingPiece.piece === 'bishop') {
         if (checkPieceX > x && checkPieceY > y) {
-          for (let j = x + 1, k = y + 1; j < checkPieceX; j++, k++) {
+          for (let j = x + 1, k = y + 1; j < checkPieceX; j++ , k++) {
             replyVectors.push([j, k]);
           }
         }
         if (checkPieceX > x && checkPieceY < y) {
-          for (let j = x + 1, k = y - 1; j < checkPieceX; j++, k--) {
+          for (let j = x + 1, k = y - 1; j < checkPieceX; j++ , k--) {
             replyVectors.push([j, k]);
           }
         }
         if (checkPieceX < x && checkPieceY < y) {
-          for (let j = x - 1, k = y - 1; j > checkPieceX; j--, k--) {
+          for (let j = x - 1, k = y - 1; j > checkPieceX; j-- , k--) {
             replyVectors.push([j, k]);
           }
         }
         if (checkPieceX < x && checkPieceY > y) {
-          for (let j = x - 1, k = y + 1; j > checkPieceX; j--, k++) {
+          for (let j = x - 1, k = y + 1; j > checkPieceX; j-- , k++) {
             replyVectors.push([j, k]);
           }
         }
@@ -181,7 +180,6 @@ function isMate(Pieces, Player) {
       return true;
     }
 
-
     // examine opponents first then own pieces to see if a checking rook, queen or bishop approach vector is already blocked
     removeAlreadyBlockedPiecesFromCheckArr(board) {
       const [kingX, kingY] = this.state.defendingKingSquare;
@@ -226,22 +224,22 @@ function isMate(Pieces, Player) {
             const { y } = board.state.inCheckArr[i][0];
 
             if (x > kingX && y > kingY) {
-              for (let j = kingX + 1, k = kingY + 1; j < x; j++, k++) {
+              for (let j = kingX + 1, k = kingY + 1; j < x; j++ , k++) {
                 tmpArr.push([j, k]);
               }
             }
             if (x > kingX && y < kingY) {
-              for (let j = kingX + 1, k = kingY - 1; j < x; j++, k--) {
+              for (let j = kingX + 1, k = kingY - 1; j < x; j++ , k--) {
                 tmpArr.push([j, k]);
               }
             }
             if (x < kingX && y < kingY) {
-              for (let j = kingX - 1, k = kingY - 1; j > x; j--, k--) {
+              for (let j = kingX - 1, k = kingY - 1; j > x; j-- , k--) {
                 tmpArr.push([j, k]);
               }
             }
             if (x < kingX && y > kingY) {
-              for (let j = kingX - 1, k = kingY + 1; j > x; j--, k++) {
+              for (let j = kingX - 1, k = kingY + 1; j > x; j-- , k++) {
                 tmpArr.push([j, k]);
               }
             }
@@ -303,8 +301,7 @@ function isMate(Pieces, Player) {
         }
       }());
 
-      // could refactor the following 'check blocking' functions as very similar although can more easily see what the program is doing kept separate
-      // also in 2nd func need to log player's piece as fixed if being in situe blocks an opponents check, player is unable to move it
+      // could refactor the following 'check blocking' functions as similar although can more easily see what the program is doing kept separate
       (function isAttackerBlockingApproachVector() {
         const playerPieces = (board.player === 0) ? board.state.player1Pieces : board.state.player0Pieces;
         const attackV = Array.from(attackVectors);
@@ -332,46 +329,66 @@ function isMate(Pieces, Player) {
       }());
       // is defender already blocking a potential checking piece if moved
       (function isPlayerBlockingApproachVector() {
-        const playerPieces = (board.player === 0) ? board.state.player0Pieces : board.state.player1Pieces;
+        const playerPieces = (board.player === 0) ? Array.from(board.state.player0Pieces) : Array.from(board.state.player1Pieces);
+        // can't block with King remove from playerPieces array
+        for (let q = 0; q < playerPieces.length; q++) {
+          if (playerPieces[q].piece === 'king') {
+            playerPieces.splice(q, 1);
+            break;
+          }
+        }
         const attackV = Array.from(attackVectors);
         let blockingPiecesHoldingArr = [];
-        for (let i = 0; i < playerPieces.length; i++) {
-          const { x: ownPieceX, y: ownPieceY } = playerPieces[i];
-          for (let j = 0; j < attackV.length; j++) {
-            for (let k = 0; k < attackV[j][1].length; k++) {
-              if (ownPieceX === attackV[j][1][k][0] && ownPieceY === attackV[j][1][k][1]) {
-                // add it to the holding array
-                blockingPiecesHoldingArr.push(playerPieces[i]);
-                // remove the attacking piece from inCheck arrays and attackVectors
-                for (let l = 0; l < board.state.inCheckArr.length; l++) {
-                  const { x: checkingPieceX, y: checkingPieceY } = board.state.inCheckArr[l][0];
-                  if (checkingPieceX === attackV[j][0].x && checkingPieceY === attackV[j][0].y) {
-                    // fixed piece as blocking opponent, in-check otherwise
-                    board.state.inCheckArr.splice(l, 1);
-                    attackVectors.splice(j, 1);
-                    if (j > 0) {
-                      j--;
-                      k = -1;
-                    }
+
+        // check attackV to see if threat already blocked by own pieces
+        let breakAllLoopsCheck = false;
+        for (let i = 0; i < attackV.length; i++) {
+          for (let j = 0; j < attackV[i][1].length; j++) {
+            for (let k = 0; k < playerPieces.length; k++) {
+              const { x: blockingPieceX, y: blockingPieceY } = playerPieces[k];
+              if (blockingPieceX === attackV[i][1][j][0] && blockingPieceY === attackV[i][1][j][1]) {
+                blockingPiecesHoldingArr.push(playerPieces[k]);
+                // remove threat from inCheck array as currently blocked by player
+                for (let z = 0; z < board.state.inCheckArr.length; z++) {
+                  if (attackV[i][0].x === board.state.inCheckArr[z][0].x && attackV[i][0].y === board.state.inCheckArr[z][0].y) {
+                    board.state.inCheckArr.splice(z, 1);
                   }
                 }
               }
-              if (blockingPiecesHoldingArr.length > 1) {
+              // if only piece blocking the approach vector, piece is fixed in place
+              if (j === attackV[i][1].length - 1 && k === playerPieces.length - 1) {
+                if (blockingPiecesHoldingArr.length === 1) {
+                  board.state.fixedPiecesArr.push(blockingPiecesHoldingArr);
+                }
+                // remove from attackV, no further threat posed
+                if (blockingPiecesHoldingArr.length > 0) {
+                  attackV.splice(i, 1);
+                  if (i > 0) {
+                    i--;
+                  }
+                  j = -1;
+                }
                 blockingPiecesHoldingArr = [];
+              }
+              if (attackV.length === 0) {
+                breakAllLoopsCheck = true;
                 break;
               }
-              if (i === playerPieces.length - 1 && j === attackV.length - 1 && k === attackV[j][1].length - 1 && blockingPiecesHoldingArr.length === 1) {
-                board.state.fixedPiecesArr.push(blockingPiecesHoldingArr);
-              }
             }
+            if (breakAllLoopsCheck) {
+              break;
+            }
+          }
+          if (breakAllLoopsCheck) {
+            break;
           }
         }
         if (board.state.inCheckArr.length === 0) {
           this.state.isMate = false;
         }
+        // for use later when attempting to block rook, queen or bishop attackVectors
+        board.state.attackVectors.push(attackV);
       }());
-      // for use later when try to block rook, queen or bishop attackVectors
-      board.state.attackVectors.push(attackVectors);
     }
 
     ableToTakeorBlockOpponentsCheckingPiece() {
@@ -408,14 +425,15 @@ function isMate(Pieces, Player) {
             // a square 'checked' by another piece
             if (thePce === 'king') {
               for (let k = 0; k < this.state.threatenedSquares.length; k++) {
-                for (let l = 0; l < this.state.threatenedSquares[i][1].length; l++) {
-                  if (JSON.stringify([checkingPieceX, checkingPieceY]) === JSON.stringify(this.state.threatenedSquares[i][1][l])) {
+                for (let l = 0; l < this.state.threatenedSquares[k][1].length; l++) {
+                  if (JSON.stringify([checkingPieceX, checkingPieceY]) === JSON.stringify(this.state.threatenedSquares[k][1][l])) {
                     this.state.isMate = true;
                     return true;
                   }
                 }
               }
             }
+            // otherwise OK to take checking piece
             this.state.isMate = false;
             return false;
           }
@@ -441,7 +459,7 @@ function isMate(Pieces, Player) {
         }
 
         const remainingPieces = Array.from(defPiecesMinusPawns);
-        
+
         for (let i = 0; i < remainingPieces.length; i++) {
           for (let j = 0; j < remainingPieces[i][1].length; j++) {
             for (let k = 0; k < this.state.attackVectors[0].length; k++) {
@@ -514,6 +532,35 @@ function isMate(Pieces, Player) {
         this.minusThreatenedSquares(availMoves);
       }
     }
+    // special funcitonality for pawns initialMove and enPassant
+    pawnSpecialMoveCheck(boardThreatenedDefendedSquares, board) {
+      for (let i = 0; i < this.pieces.length; i++) {
+        if (this.pieces[i].piece === 'pawn') {
+          if (this.player === 0) {
+            if (this.pieces[i].y === 6) {
+              boardThreatenedDefendedSquares.buildInRangeOfPawn(null, this.player, [], 'initialMove', board);
+            }
+            if (this.pieces[i].y === 3 && this.pieces[i].prevY === 1) {
+              boardThreatenedDefendedSquares.buildInRangeOfPawn(null, this.player, [], 'enPassant', board);
+            }
+          }
+    
+          if (this.state.isMate === false) {
+            return false;
+          }
+    
+          if (this.player === 1) {
+            if (board.pieces[i].y === 1) {
+              boardThreatenedDefendedSquares.buildInRangeOfPawn(null, this.player, [], 'initialMove', board);
+            }
+            if (this.pieces[i].y === 4 && this.pieces[i].prevY === 6) {
+              boardThreatenedDefendedSquares.buildInRangeOfPawn(null, board.player, [], 'enPassant', board);
+            }
+          }
+        }
+      }
+      return true;
+    }
   }
 
   // object composition factory returns object exposing methods to create inRange squares
@@ -582,7 +629,7 @@ function isMate(Pieces, Player) {
         // if pawns are fixed in place as currently blocking checking piece
         function removeFixedPawns() {
           const defendingPawns = [];
-          const playerPieces = (playr === 0) ? board.state.player0Pieces : board.state.player0Pieces;
+          const playerPieces = (playr === 0) ? board.state.player0Pieces : board.state.player1Pieces;
 
           for (let i = 0; i < playerPieces.length; i++) {
             if (playerPieces[i].piece === 'pawn') {
@@ -593,16 +640,21 @@ function isMate(Pieces, Player) {
           if (board.state.fixedPiecesArr.length > 0) {
             for (let i = 0; i < board.state.fixedPiecesArr.length; i++) {
               for (let j = 0; j < defendingPawns.length; j++) {
-                if (board.state.fixedPiecesArr[i].x === defendingPawns[j].x && board.state.fixedPiecesArr[i].y === defendingPawns[j].y) {
+                if (board.state.fixedPiecesArr[i][0].x === defendingPawns[j].x && board.state.fixedPiecesArr[i][0].y === defendingPawns[j].y) {
                   defendingPawns.splice(j, 1);
-                  if (i > 0) {
-                    i--;
+                  if (j > 0) {
+                    j--;
                   }
-                  j = 0;
                   if (defendingPawns.length === 0) {
                     break;
                   }
+                  if (i > 0) {
+                    i--;
+                  }
                 }
+              }
+              if (defendingPawns.length === 0) {
+                break;
               }
             }
           }
@@ -624,14 +676,16 @@ function isMate(Pieces, Player) {
               squaresBlockableByPawnInitialMove.push([pawnsAvailtoMove[i].x, pawnsAvailtoMove[i].y + 2]);
             }
           }
-          
+          // if piece has approach vector, can it be blocked by pawn initial move
           const thePce = board.state.inCheckArr[0][0].piece;
           if (thePce === 'rook' || thePce === 'bishop' || thePce === 'queen') {
-            for (let k = 0; k < squaresBlockableByPawnInitialMove.length; k++) {
-              for (let l = 0; l < board.state.attackVectors[0][0].length; l++) {
-                if (JSON.stringify(squaresBlockableByPawnInitialMove[k]) === JSON.stringify(board.state.attackVectors[0][0][1][l])) {
-                  Board.state.isMate = false;
-                  return false;
+            for (let c = 0; c < board.state.attackVectors.length; c++) {
+              for (let d = 0; d < board.state.attackVectors[c][0][1].length; d++) {
+                for (let e = 0; e < squaresBlockableByPawnInitialMove.length; e++) {
+                  if (JSON.stringify(board.state.attackVectors[c][0][1][d]) === JSON.stringify(squaresBlockableByPawnInitialMove[e])) {
+                    Board.state.isMate = false;
+                    return false;
+                  }
                 }
               }
             }
@@ -639,13 +693,28 @@ function isMate(Pieces, Player) {
           Board.state.isMate = true;
           return true;
         }
-      
+
+        if (specialMovePseudoOverloading === 'enPassant') {
+          const pawnsAvailtoMove = removeFixedPawns();
+          const Board = board;
+          const { x: checkingPieceX, y: checkingPieceY } = Board.state.inCheckArr[0][0];
+          // if can take via en-passant
+          for (let i = 0; i < pawnsAvailtoMove.length; i++) {
+            if ((pawnsAvailtoMove[i].y === checkingPieceY) && ((pawnsAvailtoMove[i].x === checkingPieceX - 1) || (pawnsAvailtoMove[i].x === checkingPieceX + 1))) {
+              Board.state.isMate = false;
+              return false;
+            }
+          }
+          // otherwise, out of options to avoid a mate
+          Board.state.isMate = true;
+          return true;
+        }
+
         // regular inRange of pawns, diagonal attack vector
         const inRange = [];
         const { x } = pawnObj;
         const { y } = pawnObj;
-        // if player => 0 threats advancing down the board with y increasing
-        if (playr === 0) {
+        if (pawnObj.owner === 0) {
           if (x - 1 >= 0) {
             inRange.push([x - 1, y - 1]);
           }
@@ -653,12 +722,11 @@ function isMate(Pieces, Player) {
             inRange.push([x + 1, y - 1]);
           }
         }
-        // advancing up the board with y decreasing
-        if (playr === 1) {
-          if ((x - 1) >= 0) {
+        if (pawnObj.owner === 1) {
+          if (x - 1 >= 0) {
             inRange.push([x - 1, y + 1]);
           }
-          if ((x + 1) <= 7) {
+          if (x + 1 <= 7) {
             inRange.push([x + 1, y + 1]);
           }
         }
@@ -806,197 +874,32 @@ function isMate(Pieces, Player) {
   if (board.state.inCheckArr.length === 0) {
     return false;
   }
-  board.removeAlreadyBlockedPiecesFromCheckArr(board);
-  // buildinRangeofKing component reusable from anywhere, resulting array passed in as argument
 
+  board.removeAlreadyBlockedPiecesFromCheckArr(board);
+
+  // buildinRangeofKing component reusable from anywhere, resulting array passed in as argument
   board.kingAbletoMovetoFreeSquare(boardThreatenedDefendedSquares.buildInRangeOfKing({ piece: 'king', x: board.state.defendingKingSquare[0], y: board.state.defendingKingSquare[1] }, []));
 
   if (board.state.isMate === false) {
     return false;
   }
-
+  // can player take or block the checking piece
   board.ableToTakeorBlockOpponentsCheckingPiece();
 
   if (board.state.isMate === false) {
     return false;
   }
 
-  boardThreatenedDefendedSquares.buildInRangeOfPawn(null, board.player, [], 'initialMove', board);
+  // are there any special pawn moves available
+  board.pawnSpecialMoveCheck(boardThreatenedDefendedSquares, board);
+
   return board.state.isMate;
 }
 
 module.exports = isMate;
 
-
+/* usage
 const pieces =
-[ { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
-  { piece: 'queen', owner: 1, x: 0, y: 7 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'rook', owner: 0, x: 1, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'rook', owner: 0, x: 5, y: 7 },
-  { piece: 'rook', owner: 1, x: 3, y: 4 } ];
-
-console.log(isMate(pieces, 0));
-
-
-/*
-const pieces =
-[ { piece: 'pawn', owner: 0, x: 6, y: 4 },
-  { piece: 'pawn', owner: 0, x: 5, y: 5 },
-  { piece: 'pawn', owner: 0, x: 3, y: 6 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 7, y: 6 },
-  { piece: 'queen', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'bishop', owner: 0, x: 5, y: 7 },
-  { piece: 'knight', owner: 0, x: 6, y: 7 },
-  { piece: 'rook', owner: 0, x: 7, y: 7 },
-  { piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 },
-  { piece: 'king', owner: 1, x: 4, y: 0 } ];
-
-console.log(isMate(pieces, 0));
-*/
-
-/*
-const pieces =  [ { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
-  { piece: 'queen', owner: 1, x: 0, y: 7 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'bishop', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'queen', owner: 0, x: 5, y: 7 },
-  { piece: 'pawn', owner: 0, x: 2, y: 6 } ];
-
-console.log(isCheck(pieces, 0));
-*/
-/*
-const pcs = [
-  { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'queen', owner: 1, x: 0, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 }
-];
-
-console.log(isCheck(pcs, 0));
-*/
-
-/*
-console.log(isCheck(pieces, 0));
-
-
-const pieces = [
-{ piece: 'king', owner: 1, x: 4, y: 0 },
-{ piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
-{ piece: 'queen', owner: 1, x: 0, y: 7 },
-{ piece: 'pawn', owner: 0, x: 4, y: 6 },
-{ piece: 'pawn', owner: 0, x: 5, y: 6 },
-{ piece: 'rook', owner: 0, x: 1, y: 7 },
-{ piece: 'bishop', owner: 0, x: 3, y: 7 },
-{ piece: 'king', owner: 0, x: 4, y: 7 },
-{ piece: 'rook', owner: 0, x: 5, y: 7 } ];
-
-
-[ { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
-  { piece: 'queen', owner: 1, x: 0, y: 7 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'rook', owner: 0, x: 1, y: 7 },
-  { piece: 'bishop', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'rook', owner: 0, x: 5, y: 7 } ]
-  should not be a mate
-
-  [ { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'bishop', owner: 1, x: 1, y: 4, prevX: 3, prevY: 2 },
-  { piece: 'queen', owner: 1, x: 0, y: 7 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'knight', owner: 0, x: 1, y: 7 },
-  { piece: 'bishop', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'rook', owner: 0, x: 5, y: 7 } ]
-  should not be a mate
-
-
-
-[ { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'bishop', owner: 1, x: 0, y: 3, prevX: 3, prevY: 0 },
-  { piece: 'queen', owner: 1, x: 0, y: 7 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'rook', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'bishop', owner: 0, x: 5, y: 7 },
-  { piece: 'pawn', owner: 0, x: 1, y: 6 } ]
-  Pawn 1,6 can intercept by double moving
-
-[ { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'rook', owner: 0, x: 5, y: 7 },
-  { piece: 'rook', owner: 1, x: 3, y: 7, prevX: 3, prevY: 0 } ]
-  should not be a mate - erroring currently?
-
-
-
-
-[ { piece: 'knight', owner: 0, x: 3, y: 6 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'queen', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'bishop', owner: 0, x: 5, y: 7 },
-  { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'queen', owner: 1, x: 4, y: 1 },
-  { piece: 'knight', owner: 1, x: 3, y: 5, prevX: 2, prevY: 3 } ]
-  erroring currently
-
-[ { piece: 'pawn', owner: 0, x: 6, y: 4 },
-  { piece: 'pawn', owner: 0, x: 5, y: 5 },
-  { piece: 'pawn', owner: 0, x: 3, y: 6 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 7, y: 6 },
-  { piece: 'queen', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'bishop', owner: 0, x: 5, y: 7 },
-  { piece: 'knight', owner: 0, x: 6, y: 7 },
-  { piece: 'rook', owner: 0, x: 7, y: 7 },
-  { piece: 'queen', owner: 1, x: 7, y: 4, prevX: 3, prevY: 0 },
-  { piece: 'king', owner: 1, x: 4, y: 0 } ]
-  mate for player 0
-
-
-  [ { piece: 'pawn', owner: 0, x: 4, y: 4 },
-  { piece: 'knight', owner: 0, x: 2, y: 5 },
-  { piece: 'pawn', owner: 0, x: 6, y: 5 },
-  { piece: 'knight', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'queen', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'bishop', owner: 0, x: 5, y: 7 },
-  { piece: 'knight', owner: 1, x: 5, y: 5, prevX: 3, prevY: 4 },
-  { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'pawn', owner: 1, x: 4, y: 3 } ]
-  mate for player 0
-
-  [ { piece: 'knight', owner: 0, x: 3, y: 6 },
-  { piece: 'pawn', owner: 0, x: 4, y: 6 },
-  { piece: 'pawn', owner: 0, x: 5, y: 6 },
-  { piece: 'queen', owner: 0, x: 3, y: 7 },
-  { piece: 'king', owner: 0, x: 4, y: 7 },
-  { piece: 'bishop', owner: 0, x: 5, y: 7 },
-  { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'queen', owner: 1, x: 4, y: 1 },
-  { piece: 'knight', owner: 1, x: 3, y: 5, prevX: 2, prevY: 3 } ]
-  TypeError: Cannot read property '0' of undefined
-    at NewBoard.kingAbletoMovetoFreeSquare
-    at isMate
-
 [ { piece: 'pawn', owner: 0, x: 4, y: 4 },
   { piece: 'knight', owner: 0, x: 2, y: 5 },
   { piece: 'pawn', owner: 0, x: 6, y: 5 },
@@ -1007,24 +910,7 @@ const pieces = [
   { piece: 'bishop', owner: 0, x: 5, y: 7 },
   { piece: 'knight', owner: 1, x: 5, y: 5, prevX: 3, prevY: 4 },
   { piece: 'king', owner: 1, x: 4, y: 0 },
-  { piece: 'pawn', owner: 1, x: 4, y: 3 } ]
-ReferenceError: x is not defined
-    at NewBoard.checkReplyVector
-    at
+  { piece: 'pawn', owner: 1, x: 4, y: 3 } ];
 
-const pieces = [
-  // { piece: 'king', owner: 1, x: 0, y: 0 },
-  // { piece: 'bishop', owner: 1, x: 1, y: 2 },
-  // { piece: 'bishop', owner: 1, x: 5, y: 0},
-  // { piece: 'queen', owner: 1, x: 0, y: 7 },
-  { piece: 'pawn', owner: 0, x: 6, y: 6 },
-  { piece: 'pawn', owner: 0, x: 7, y: 6 },
-  { piece: 'king', owner: 0, x: 7, y: 7 },
-  // { piece: 'knight', owner: 0, x: 6, y: 7 },
-  { piece: 'knight', owner: 1, x: 6, y: 5},
-  // { piece: 'bishop', owner: 0, x: 5, y: 1 },
-  // piece: 'rook', owner: 1, x: 4, y: 2 },
-  // { piece: 'knight', owner: 1, x: 3, y: 5 },
-      => false
-];
+console.log(isMate(pieces, 0));
 */
