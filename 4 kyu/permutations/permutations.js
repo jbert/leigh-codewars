@@ -73,10 +73,13 @@ function permutations(string) {
     const Tot = [].concat(...tempTotal);
     Tot.sort();
     const uniqArray = uniqArry(Tot);
+    console.log(uniqArray.length);
     return uniqArray;
   }
   return uniqArry;
 }
 
-// usage: console.log(permutations('abcd'));
 module.exports = permutations;
+
+// usage:
+// console.log(permutations('abcdefg'));
