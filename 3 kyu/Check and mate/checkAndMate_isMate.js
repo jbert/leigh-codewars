@@ -309,8 +309,7 @@ function isMate(Pieces, Player) {
         }
       }());
 
-      // could refactor the following 'check blocking' functions as similar although can
-      // more easily see what the program is doing kept separate
+      // could refactor the following 'check blocking' funcs
       (function isAttackerBlockingApproachVector() {
         const playerPieces = (board.player === 0) ?
           board.state.player1Pieces : board.state.player0Pieces;
@@ -618,9 +617,10 @@ function isMate(Pieces, Player) {
         return pieceThreatsorDefendableSquaresArray;
       },
 
-      // in case we decide to add an entirely new piece to extend our usual game of chess!
+      // in case we decide to add an entirely new piece to extend our usual game of chess
+      // to invoke: boardThreatenedefendedSquares.newPieceName()
       openClosedPrincipleAddNewPieceFunctionality(playr, board, newPieceName, newPieceRules) {
-        return newPieceName(newPieceRules(playr, board));
+        return function(newPieceName(newPieceRules(playr, board)) },
       },
 
       // abbrev: pieceThreatsorDefendableSquaresArray to pToDSA when used as params
