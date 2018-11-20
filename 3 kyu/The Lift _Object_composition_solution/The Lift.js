@@ -1,4 +1,5 @@
-// Object composition solution -> concatenation inheritance
+// Object composition solution, arguably still inheritance -> concatenation inheritance
+// Without a large hierarchical taxonomy
 
 // intentionally mutating state param, remove eslint warning on param reassign for state object
 /* eslint no-param-reassign:["error",
