@@ -408,7 +408,8 @@ describe('theLift() should return an array of floor visits in the correct sequen
   ];
   tests.forEach(function (test) {
     it(`Checks ${test.queues}: capacity ${test.capacity} is ${test.expected}`, function () {
-      const res = theLift(test.queues, test.capacity);
+      const lift = theLift(test.queues, test.capacity);
+      const res = lift.controller();
       expect(res).to.eql(test.expected);
     });
   });

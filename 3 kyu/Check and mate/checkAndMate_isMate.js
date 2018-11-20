@@ -618,9 +618,9 @@ function isMate(Pieces, Player) {
       },
 
       // in case we decide to add an entirely new piece to extend our usual game of chess
-      // to invoke: boardThreatenedefendedSquares.newPieceName()
-      openClosedPrincipleAddNewPieceFunctionality(playr, board, newPieceName, newPieceRules) {
-        return function(newPieceName(newPieceRules(playr, board)) },
+      // Open Closed Principle - extendable functionaility built in
+      openClosedPrincipleAddNewPieceFunctionality(newPieceRules) {
+        Object.assign(threatsOrDefendableSquaresFactory, newPieceRules);
       },
 
       // abbrev: pieceThreatsorDefendableSquaresArray to pToDSA when used as params
@@ -935,6 +935,17 @@ function isMate(Pieces, Player) {
 
   // are there any special pawn moves available
   board.pawnSpecialMoveCheck(boardThreatenedDefendedSquares, board);
+
+  // to add new piece functionaility - Open Closed Principle
+  /*
+  const newPieceRules = {
+    newPiece() { console.log('New piece functionaility added successfully'); },
+  };
+  boardThreatenedDefendedSquares.openClosedPrincipleAddNewPieceFunctionality(newPieceRules);
+
+  // to invoke new functionaility
+  threatsOrDefendableSquaresFactory.newPiece();
+  */
 
   return board.state.isMate;
 }

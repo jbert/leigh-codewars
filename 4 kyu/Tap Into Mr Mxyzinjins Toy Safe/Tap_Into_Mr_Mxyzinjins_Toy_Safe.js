@@ -1,6 +1,7 @@
 // Just writing binary search solution, check back in 24 hours!
 
-// if you toString.toString() the login function, you see:
+
+// when login.toString() on Codewars, you can then see the login function:
 // function check(pw) {
 //   return new global.RegExp(`^${pw}$`).test(passwd);
 // }

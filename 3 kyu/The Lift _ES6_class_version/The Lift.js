@@ -213,7 +213,7 @@ const theLift = function theLift(queues, capacity) {
       this.moveLiftDown();
     }
 
-    // main lift logic, cycles 'up' and 'down' until allQueue & onBoard are emptied
+    // main lift logic, cycles 'up' and 'down' until allQueue & onBoard are length 0
     controller() {
       this.buildWaiting();
       while (this.allQueue.length > 0 || this.onBoard.length > 0) {
@@ -224,6 +224,7 @@ const theLift = function theLift(queues, capacity) {
           this.startDescent();
         }
       }
+      // make sure returns to ground on finish
       if (this.stopsList[this.stopsList.length - 1] !== 0) {
         this.stopsList.push(0);
       }
@@ -240,20 +241,14 @@ const theLift = function theLift(queues, capacity) {
 
 module.exports = theLift;
 
-
 // manual use:
+// console.log(theLift([[1, 2, 4, 4], [4, 2, 0, 3], [4, 4, 1], [], [2]], 2));
+// expected: [ 0, 1, 2, 4, 2, 1, 0, 1, 2, 4, 1, 2, 3, 4, 0 ]
+
 /*
-console.log(theLift([[1, 2, 4, 4], [4, 2, 0, 3], [4, 4, 1], [], [2]], 2));
-expected: [ 0, 1, 2, 4, 2, 1, 0, 1, 2, 4, 1, 2, 3, 4, 0 ]
-
-
-Synopsis
 A multi-floor building has a Lift in it.
-
 People are queued on different floors waiting for the Lift.
-
 Some people want to go up. Some people want to go down.
-
 The floor they want to go to is represented by a number (i.e. when they enter the Lift this is
 the button they will press)
 
