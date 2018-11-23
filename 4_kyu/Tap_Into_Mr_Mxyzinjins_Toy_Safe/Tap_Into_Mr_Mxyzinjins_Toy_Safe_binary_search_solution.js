@@ -1,7 +1,12 @@
 // Kata instructions below
-// just writing binary search solution, brute force attempt built - check back later today!
+// const chars = [...Array(20972)].map((_, i) => String.fromCharCode(i + 0x4e00));
+// console.log(new global.RegExp(`[${chars[0]}-${chars[10486]}]`).test('鿪'));
+// console.log(new global.RegExp(`[${chars[10487]}-${chars[20971]}]`).test('鿪'));
 
-/*
+// solution nearly complete - finds a single char of 20,972 using binary search in 10 ms!
+// check back very shortly!
+
+
 function crack(login) {
   const t1 = new Date();
   const chars = [...Array(20972)].map((_, i) => String.fromCharCode(i + 0x4e00));
@@ -16,26 +21,37 @@ function crack(login) {
   // cycle through and locate each char, will return true if correct char, move to next char
   let known = '';
   function find() {
-    for (let indx = 0; indx < 20973; indx++) {
-      if (login(`${known}${chars[indx]}.{${length - 1}}`)) {
-        known += chars[indx];
-        length -= 1;
-        break;
+    let firstIndx = 0;
+    let lastIndx = chars.length - 1;
+    let splitIndx = Math.floor(lastIndx / 2);
+    while (lastIndx - firstIndx !== 1) {
+      if (login(`${known}[${chars[firstIndx]}-${chars[splitIndx]}].+`)) {
+        lastIndx = Math.floor(lastIndx / 2);
+      } else {
+        firstIndx = splitIndx + 1;
+        splitIndx += Math.floor((lastIndx - splitIndx) / 2);
       }
     }
-    if (length === 0) {
-      const t2 = new Date();
-      console.log(t2 - t1);
-    }
-    if (length > 0) {
-      find();
-    }
+    const t2 = new Date();
+    console.log(t2 - t1);
+    known += chars[firstIndx];
     return known;
   }
+  /*
+    if (length < 0) {
+      find();
+    }
+  */
   return find();
 }
-*/
 
+const securePassword = '鿪';
+// const securePassword = '丆万';
+
+function mrMixyzinjinsLogin(pw) {
+  return new global.RegExp(`^${pw}$`).test(securePassword);
+}
+console.log(crack(mrMixyzinjinsLogin));
 
 // manual use, will crack the password, returning time taken and the password
 /*

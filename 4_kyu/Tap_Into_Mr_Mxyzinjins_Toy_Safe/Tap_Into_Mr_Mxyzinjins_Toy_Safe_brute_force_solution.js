@@ -1,7 +1,7 @@
 // Kata instructions below
 // This is a brute force solution, to break a password with 20,972 possible options per character,
 // 1536 chars in length, takes my machine 130 secs.. This does run very quickly, but is too long
-// to pass the kata using brute force solution, need another approach
+// to pass the kata using brute force solution (recursion), need another approach
 
 function crack(login) {
   const t1 = new Date();
