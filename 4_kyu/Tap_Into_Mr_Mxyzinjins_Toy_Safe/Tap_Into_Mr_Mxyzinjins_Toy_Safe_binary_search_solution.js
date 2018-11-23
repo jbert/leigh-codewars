@@ -3,7 +3,7 @@
 // console.log(new global.RegExp(`[${chars[0]}-${chars[10486]}]`).test('鿪'));
 // console.log(new global.RegExp(`[${chars[10487]}-${chars[20971]}]`).test('鿪'));
 
-// solution nearly complete - finds a single char of 20,972 using binary search in 10 ms!
+// solution nearly complete - finds a single char of 20,972 using binary search in 8 ms!
 // check back very shortly!
 
 
@@ -18,7 +18,7 @@ function crack(login) {
       break;
     }
   }
-  // cycle through and locate each char, will return true if correct char, move to next char
+  // just built for a single char currently to check binary search logic
   let known = '';
   function find() {
     let firstIndx = 0;
