@@ -1,4 +1,7 @@
 // Kata instructions below
+// const chars = [...Array(20972)].map((_, i) => String.fromCharCode(i + 0x4e00));
+// console.log(new global.RegExp(`[${chars[0]}-${chars[10486]}]`).test('鿪'));
+// console.log(new global.RegExp(`[${chars[10487]}-${chars[20971]}]`).test('鿪'));
 
 // solution nearly complete - finds a single char of 20,972 using binary search in 8 ms!
 // check back very shortly!
