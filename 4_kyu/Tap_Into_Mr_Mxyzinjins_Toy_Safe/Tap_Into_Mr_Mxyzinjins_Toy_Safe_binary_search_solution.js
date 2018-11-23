@@ -6,7 +6,6 @@
 // solution nearly complete - finds a single char of 20,972 using binary search in 8 ms!
 // check back very shortly!
 
-
 function crack(login) {
   const t1 = new Date();
   const chars = [...Array(20972)].map((_, i) => String.fromCharCode(i + 0x4e00));
@@ -23,18 +22,24 @@ function crack(login) {
   function find() {
     let firstIndx = 0;
     let lastIndx = chars.length - 1;
-    let splitIndx = Math.floor(lastIndx / 2);
-    while (lastIndx - firstIndx !== 1) {
-      if (login(`${known}[${chars[firstIndx]}-${chars[splitIndx]}].+`)) {
-        lastIndx = Math.floor(lastIndx / 2);
+    let splitIndx = Math.ceil(lastIndx / 2);
+    while (lastIndx - firstIndx > 1) {
+      if (login(`${known}[${chars[firstIndx]}-${chars[splitIndx]}]`)) {
+        lastIndx = splitIndx;
+        splitIndx = firstIndx + Math.ceil((splitIndx - firstIndx) / 2);
       } else {
         firstIndx = splitIndx + 1;
-        splitIndx += Math.floor((lastIndx - splitIndx) / 2);
+        splitIndx += Math.ceil((lastIndx - splitIndx) / 2);
       }
+    }
+    if (login(`${known}${chars[firstIndx]}`)) {
+      known += chars[firstIndx];
+    }
+    if (login(`${known}${chars[lastIndx]}`)) {
+      known += chars[lastIndx];
     }
     const t2 = new Date();
     console.log(t2 - t1);
-    known += chars[firstIndx];
     return known;
   }
   /*
@@ -45,13 +50,18 @@ function crack(login) {
   return find();
 }
 
-const securePassword = '鿪';
-// const securePassword = '丆万';
+// const securePassword = '丆';
+// const securePassword = '鿪';
+// const securePassword = '万';
+// const securePassword = '佁';
+const securePassword = '口';
 
 function mrMixyzinjinsLogin(pw) {
   return new global.RegExp(`^${pw}$`).test(securePassword);
 }
+
 console.log(crack(mrMixyzinjinsLogin));
+
 
 // manual use, will crack the password, returning time taken and the password
 /*
