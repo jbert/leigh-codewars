@@ -3,7 +3,6 @@
 
 const { expect } = require('chai');
 const crack = require('../Tap_Into_Mr_Mxyzinjins_Toy_Safe_brute_force_solution.js');
-const crack2 = require('../Tap_Into_Mr_Mxyzinjins_Toy_Safe_binary_search_solution.js');
 
 describe('crack() should successfully crack the password', function () {
   const tests = [
@@ -18,16 +17,6 @@ describe('crack() should successfully crack the password', function () {
     }
     it(`Brute force solution cracks the password: ${test.expected}`, function () {
       const res = crack(mrMixyzinjinsLogin);
-      expect(res).to.eql(test.expected);
-    });
-  });
-
-  tests.forEach(function (test) {
-    function mrMixyzinjinsLogin(pw) {
-      return new global.RegExp(`^${pw}$`).test(test.securePassword);
-    }
-    it(`Binary search solution cracks the password: ${test.expected}`, function () {
-      const res = crack2(mrMixyzinjinsLogin);
       expect(res).to.eql(test.expected);
     });
   });
