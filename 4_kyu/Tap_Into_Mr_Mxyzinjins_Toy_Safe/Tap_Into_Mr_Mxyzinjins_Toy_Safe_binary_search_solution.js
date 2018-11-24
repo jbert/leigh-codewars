@@ -1,11 +1,11 @@
 // Kata instructions below
-
-// solution nearly complete - finds a single char of 20,972 using binary search in 8 ms!
-// check back very shortly!
+// Solved using binary search & recursion, cracks a 1285 chars length password
+// with 20,991 char options in <1500ms
+// can optimise this further at the expense of readability
 
 function crack(login) {
   const t1 = new Date();
-  const chars = [...Array(20972)].map((_, i) => String.fromCharCode(i + 0x4e00));
+  const chars = [...Array(20991)].map((_, i) => String.fromCharCode(i + 0x4e00));
   // find password length
   let length = 0;
   for (let i = 0; i < 2049; i++) {
@@ -14,55 +14,49 @@ function crack(login) {
       break;
     }
   }
-  // just built for a single char currently to check binary search logic
   let known = '';
   function find() {
-    let firstIndx = 0;
-    let lastIndx = chars.length - 1;
-    let splitIndx = Math.ceil(lastIndx / 2);
-    while (lastIndx - firstIndx > 1) {
-      if (login(`${known}[${chars[firstIndx]}-${chars[splitIndx]}]`)) {
-        lastIndx = splitIndx;
-        splitIndx = firstIndx + Math.ceil((splitIndx - firstIndx) / 2);
-      } else {
-        firstIndx = splitIndx + 1;
-        splitIndx += Math.ceil((lastIndx - splitIndx) / 2);
+    for (let indx = 0; indx < 20992; indx++) {
+      let firstIndx = 0;
+      let lastIndx = chars.length - 1;
+      let midIndx = Math.ceil(lastIndx / 2);
+      while (lastIndx - firstIndx > 1) {
+        if (login(`${known}[${chars[firstIndx]}-${chars[midIndx]}].{${length - 1}}`)) {
+          lastIndx = midIndx;
+          midIndx = firstIndx + Math.ceil((midIndx - firstIndx) / 2);
+        } else {
+          firstIndx = midIndx + 1;
+          midIndx += Math.ceil((lastIndx - midIndx) / 2);
+        }
       }
+      // should be just 2 options left
+      if (login(`${known}${chars[firstIndx]}.*`)) {
+        known += chars[firstIndx];
+      } else {
+        known += chars[lastIndx];
+      }
+      length -= 1;
+      break;
     }
-    if (login(`${known}${chars[firstIndx]}`)) {
-      known += chars[firstIndx];
+    // if at end of password, stop the timer
+    if (length === 0) {
+      const t2 = new Date();
+      console.log(t2 - t1);
     }
-    if (login(`${known}${chars[lastIndx]}`)) {
-      known += chars[lastIndx];
-    }
-    const t2 = new Date();
-    console.log(t2 - t1);
-    return known;
-  }
-  /*
-    if (length < 0) {
+    // if still have characters left not known, ie (length > zero) -> recurse
+    if (length > 0) {
       find();
     }
-  */
+    return known;
+  }
   return find();
 }
 
-// const securePassword = '丆';
-// const securePassword = '鿪';
-// const securePassword = '万';
-// const securePassword = '佁';
-const securePassword = '口';
+module.exports = crack;
 
-function mrMixyzinjinsLogin(pw) {
-  return new global.RegExp(`^${pw}$`).test(securePassword);
-}
-
-console.log(crack(mrMixyzinjinsLogin));
-
-
-// manual use, will crack the password, returning time taken and the password
+// manual use: de-comment lines 52-59 will crack password, returning time taken and the password
 /*
-const securePassword = '一丁丂七丄丅丆万丈三上下丌不与丏丐丑丒专且丕世丗丘丙业丛东丝丞丟丠両丢丣两严並丧丨丩个丫丬中丮丯丰丱串丳临丵丶丷丸丹为主丼丽举丿乀乁乂乃乄久乆乇么义乊之乌乍乎乏乐乑乒乓乔乕乖乗乘乙乚乛乜九乞也习乡乢乣乤乥书乧乨乩乪乫乬乭乮乯买乱乲乳乴乵乶乷乸乹乺乻乼乽乾乿亀亁亂亃亄亅了亇予争亊事二亍于亏亐云互亓五井亖亗亘亙亚些亜亝亞亟亠亡亢亣交亥亦产亨亩亪享京亭亮亯亰亱亲亳亴亵亶亷亸亹人亻亼亽亾亿什仁仂仃仄仅仆仇仈仉今介仌仍从仏仐仑仒仓仔仕他仗付仙仚仛仜仝仞仟仠仡仢代令以仦仧仨仩仪仫们仭仮仯仰仱仲仳仴仵件价仸仹仺任仼份仾仿伀企伂伃伄伅伆伇伈伉伊伋伌伍伎伏伐休伒伓伔伕伖众优伙会伛伜伝伞伟传伡伢伣伤伥伦伧伨伩伪伫伬伭伮伯估伱伲伳伴伵伶伷伸伹伺伻似伽伾伿佀佁佂佃佄佅但佇佈佉佊佋佌位低住佐佑佒体佔';
+const securePassword = '一丁丂七丄丅丆万丈三上下丌不与丏丐丑丒专且丕世丗丘丙业丛东丝丞丟丠両丢丣两严並丧丨丩个丫丬中丮丯丰丱串丳临丵丶丷丸丹为主丼丽举丿乀乁乂乃乄久乆乇么义乊之乌乍乎乏乐乑乒乓乔乕乖乗乘乙乚乛乜九乞也习乡乢乣乤乥书乧乨乩乪乫乬乭乮乯买乱乲乳乴乵乶乷乸乹乺乻乼乽乾乿亀亁亂亃亄亅了亇予争亊事二亍于亏亐云互亓五井亖亗亘亙亚些亜亝亞亟亠亡亢亣交亥亦产亨亩亪享京亭亮亯亰亱亲亳亴亵亶亷亸亹人亻亼亽亾亿什仁仂仃仄仅仆仇仈仉今介仌仍从仏仐仑仒仓仔仕他仗付仙仚仛仜仝仞仟仠仡仢代令以仦仧仨仩仪仫们仭仮仯仰仱仲仳仴仵件价仸仹仺任仼份仾仿伀企伂伃伄伅伆伇伈伉伊伋伌伍伎伏伐休伒伓伔伕伖众优伙会伛伜伝伞伟传伡伢伣伤伥伦伧伨伩伪伫伬伭伮伯估伱伲伳伴伵伶伷伸伹伺伻似伽伾伿佀佅但佇佈佉佊佋佌位低住佐佑佒体佔';
 
 function mrMixyzinjinsLogin(pw) {
   return new global.RegExp(`^${pw}$`).test(securePassword);
