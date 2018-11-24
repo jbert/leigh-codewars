@@ -1,10 +1,14 @@
-// Object composition solution, arguably still inheritance -> concatenation inheritance
-// Without a large hierarchical taxonomy
+// This solution uses Eric Elliot's and Mathias Johansson (MPJ) version of 'Object Composition'
+// There is a heated debate as to if it is fully Composited, as does not strictly follow the
+// Gang of Four Composite Pattern, it's arguably still multi-inheritance/concatenation inheritance
+// But it certainly more 'component' based without a the large hierarchical taxonomy, naming
+// disputes aside!
 
 // intentionally mutating state param, remove eslint warning on param reassign for state object
 /* eslint no-param-reassign:["error",
 { "props": true, "ignorePropertyModificationsFor":["state"]}] */
 
+// include any components/functionality you'd like to assign
 const composeLiftFunctionality = state => ({
   // allQueue array -> [waiting on floor, desired floor, unique reference for later retrieval]
   buildWaiting: () => {
@@ -234,6 +238,7 @@ const theLift = (queues, capacity) => {
     minDescent: 0,
     onBoard: [],
   };
+  // assign all functionaility to 'theLift' factory
   return Object.assign(
     {},
     composeLiftFunctionality(state),
