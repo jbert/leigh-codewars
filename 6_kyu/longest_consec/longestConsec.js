@@ -17,24 +17,21 @@ function longestConsec(strings, k) {
     return '';
   }
 
-  let longestCount = 0;
-  let longestCountIndex = 0;
+  let maxCount = 0;
+  let maxCountIndex = 0;
 
   let currentCount = 0;
 
-  // start at beginning of array, loop to n-k, sum the elements concat with next k items in array
   for (let i = 0; i <= (n - k); i++) {
-    currentCount = 0;
-    for (let j = i; j < i + k; j++) {
-      currentCount += strings[j].length;
-    }
-    if (currentCount > longestCount) {
-      longestCount = currentCount;
-      longestCountIndex = i;
+    // Sum of lengths from this index
+    currentCount = strings.slice(i, i+k).map(s => s.length).reduce((a, v) => a + v)
+    if (currentCount > maxCount) {
+      maxCount = currentCount;
+      maxCountIndex = i;
     }
   }
 
-  return strings.slice(longestCountIndex, longestCountIndex + k).join('')
+  return strings.slice(maxCountIndex, maxCountIndex + k).join('')
 }
 
 console.log(longestConsec(['zone', 'abignale', 'theta', 'libeboo', 'thetrtya', 'abigailg'], 4));
