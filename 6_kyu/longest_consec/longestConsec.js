@@ -39,7 +39,7 @@ function longestConsec(strings, k) {
   return strings.slice(maxCountIndex, maxCountIndex + k).join('')
 }
 
-console.log(longestConsec(['zone', 'abignale', 'theta', 'libeboo', 'thetrtya', 'abigailg'], 4));
+// console.log(longestConsec(['zone', 'abignale', 'theta', 'libeboo', 'thetrtya', 'abigailg'], 4));
 
 // for test
 module.exports = longestConsec;
