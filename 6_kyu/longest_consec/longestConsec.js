@@ -34,11 +34,7 @@ function longestConsec(strings, k) {
     }
   }
 
-  let str = '';
-  for (let l = longestCountIndex; l < (longestCountIndex + k); l++) {
-    str += strings[l];
-  }
-  return str;
+  return strings.slice(longestCountIndex, longestCountIndex + k).join('')
 }
 
 console.log(longestConsec(['zone', 'abignale', 'theta', 'libeboo', 'thetrtya', 'abigailg'], 4));
