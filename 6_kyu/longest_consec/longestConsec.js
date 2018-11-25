@@ -17,14 +17,18 @@ function longestConsec(strings, k) {
     return '';
   }
 
-  let maxCount = 0;
-  let maxCountIndex = 0;
-
   let currentCount = 0;
 
-  for (let i = 0; i <= (n - k); i++) {
-    // Sum of lengths from this index
-    currentCount = strings.slice(i, i+k).map(s => s.length).reduce((a, v) => a + v)
+  // Prime the pump - calculate for index 0
+  let maxCount = 0;
+  let maxCountIndex = 0;
+  currentCount = strings.slice(0, k).map(s => s.length).reduce((a, v) => a + v)
+
+  for (let i = 1; i <= (n - k); i++) {
+    // We've finished this string
+    currentCount -= strings[i-1].length
+    // And want this one
+    currentCount += strings[i+k-1].length
     if (currentCount > maxCount) {
       maxCount = currentCount;
       maxCountIndex = i;
